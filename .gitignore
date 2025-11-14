@@ -1,0 +1,27 @@
+# Dependencias
+/vendor/
+/.vscode/
+/imagenes/
+/imagenes fuente/
+/documentos/
+/PHPMailer/
+/fpdf181/
+/tcpdf/
+/degrade/
+/bootstrap-datepicker/
+/libchart/
+
+# Configuración sensible
+.env
+
+# Archivos temporales
+*.log
+*.tmp
+*.bak
+
+# Bases de datos locales
+*.sqlite
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
