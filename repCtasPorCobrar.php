@@ -9,7 +9,7 @@ if (!isset($_SESSION["gnVerifica"]) or $_SESSION["gnVerifica"] != 1)
 
 require_once ("funciones/fxGeneral.php");
 require_once ("funciones/fxUsuarios.php");
-require_once ("fpdf181/fpdf.php");
+require_once ("tcpdf/tcpdf.php");
 
 $Registro = fxVerificaUsuario();
 
@@ -24,7 +24,7 @@ if ($Registro == 0)
 <?php }
 else
 {
-class PDF extends FPDF
+class PDF extends TCPDF
 {
 	public $Periodo;
 	
@@ -32,32 +32,17 @@ class PDF extends FPDF
 	function Header()
 	{
 		// Logos
-		$this->Image('imagenes/headerLogin.jpg',15,14,0,15);
+		$this->Image('imagenes/headerLogin.jpg',15,10,0,15);
 		// Title
 		$mid_x = 210; // width of the "PDF screen", fixed by now.
 		// Arial bold 18
-		$this->SetFont('arial','B',13);
-		$Titulo = utf8_decode('Cuentas por Cobrar');
-		$this->Text(($mid_x - $this->GetStringWidth($Titulo)) / 2, 13, $Titulo);
+		$this->SetFont('helvetica','B',13);
+		$Titulo = 'Cuentas por Cobrar';
+		$this->Text(($mid_x - $this->GetStringWidth($Titulo)) / 2, 11, $Titulo);
 		// Arial normal 18
-		$this->SetFont('arial','',11);
-		$Titulo = utf8_decode($this->Periodo);
-		$this->Text(($mid_x - $this->GetStringWidth($Titulo)) / 2, 18, $Titulo);
-
-		$LineaTitulo = 28;
-		$this->SetFont('arial','B',9);
-		$this->SetFillColor(0,100,255);
-		$this->SetTextColor(255,255,255);
-		$this->SetXY(15,$LineaTitulo);
-		$this->Cell(20,5,'Celular',0,0,'C',true);
-		$this->SetXY(35,$LineaTitulo);
-		$this->Cell(70,5,'Estudiante',0,0,'L',true);
-		$this->SetXY(105,$LineaTitulo);
-		$this->Cell(70,5,'Concepto',0,0,'L',true);
-		$this->SetXY(175,$LineaTitulo);
-		$this->Cell(25,5,'Monto U$',0,0,'R',true);
-		// Line break
-		$this->Ln(20);
+		$this->SetFont('helvetica','',11);
+		$Titulo = mb_convert_encoding($this->Periodo, "UTF-8");
+		$this->Text(($mid_x - $this->GetStringWidth($Titulo)) / 2, 16, $Titulo);
 	}
 	// Page footer
 	function Footer()
@@ -65,9 +50,9 @@ class PDF extends FPDF
 		// Position at 1.5 cm from bottom
 		$this->SetY(-15);
 		// Arial italic 8
-		$this->SetFont('Arial','I',8);
+		$this->SetFont('helvetica','I',8);
 		// Page number
-		$this->Cell(0,10,utf8_decode('Página ').$this->PageNo().'/{nb}',0,0,'L');
+		$this->Cell(0,10,mb_convert_encoding('Página ', "UTF-8").$this->PageNo().'/'.$this->getAliasNbPages(),0,0,'L');
 		$this->Cell(0,10,'Emitido: ' . date("d/m/Y h:i:s a") . '',0,0,'R');
 	}
 }
@@ -126,12 +111,27 @@ $FechaFin = date("Y-m-d", strtotime($_POST["dtpFechaFin"]));
 $Activos = $_POST["blActivo"];
 $Rotulo = "Hasta la fecha " . DevuelveFecha($_POST["dtpFechaFin"]);
 
-$pdf = new PDF('P','mm','Letter');
-$pdf->AliasNbPages();
+$pdf = new PDF('P', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+// set default monospaced font
+$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
+
+// set margins
+$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+$pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
+$pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
+
+// set auto page breaks
+$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+
+// set some language-dependent strings (optional)
+if (@file_exists(dirname(__FILE__).'/lang/spa.php')) {
+	require_once(dirname(__FILE__).'/lang/spa.php');
+	$pdf->setLanguageArray($l);
+}
+
 $pdf->Periodo=$Rotulo;
 $pdf->AddPage();
-$pdf->SetTextColor(0,0,0);
-$pdf->SetFont('arial','',8);
+$pdf->SetFont('helvetica','',8);
 
 //Obtención de datos
 if ($Activos == 1)
@@ -154,47 +154,65 @@ $m_cnx_MySQL = fxAbrirConexion();
 $mDatos = $m_cnx_MySQL->prepare($msConsulta);
 $mDatos->execute([$FechaFin]);
 $Registros = $mDatos->rowCount();
-$Linea = 33;
 $Suma = 0;
-$pdf->SetFillColor(255,255,255);
+$mbFondo = 0;
+
+$msHTML = "<style>";
+$msHTML .= "th{";
+$msHTML .= "background-color: rgb(0,100,255); color: rgb(255,255,255);";
+$msHTML .= "}";
+$msHTML .= ".fondoGris{";
+$msHTML .= "background-color: rgb(240,240,240); color: rgb(0,0,0);";
+$msHTML .= "}";
+$msHTML .= "</style>";
+$msHTML .= "<table>";
+$msHTML .= "<thead>";
+$msHTML .= "<tr>";
+$msHTML .= '<th style="width: 10%;">Celular</th>';
+$msHTML .= '<th style="width: 40%;">Estudiante</th>';
+$msHTML .= '<th style="width: 40%;">Concepto</th>';
+$msHTML .= '<th style="width: 10%; text-align: right;">Monto</th>';
+$msHTML .= "</tr>";
+$msHTML .= "</thead>";
+$msHTML .= "<tbody>";
 
 while ($Fila = $mDatos->fetch())
 {
 	$Matricula = $Fila["MATRICULA_REL"];
 	$Celular = $Fila["CELULAR_010"];
-	$Estudiante = utf8_decode(html_entity_decode($Fila["ESTUDIANTE"]));
-	$Concepto = utf8_decode(html_entity_decode($Fila["CONCEPTO_050"]));
+	$Estudiante = mb_convert_encoding(html_entity_decode($Fila["ESTUDIANTE"]), "UTF-8");
+	$Concepto = mb_convert_encoding(html_entity_decode($Fila["CONCEPTO_050"]), "UTF-8");
 	$Monto = $Fila["ADEUDADO_051"];
 	
-	$pdf->SetXY(15,$Linea);
-	$pdf->Cell(20,5,$Celular,0,0,'C');
-	
-	$pdf->SetXY(35,$Linea);
-	$pdf->Cell(70,5,$Estudiante);
-	
-	$pdf->SetXY(105,$Linea);
-	$pdf->Cell(70,5,$Concepto);
-	
-	$pdf->SetXY(175,$Linea);
-	$pdf->Cell(25,5,number_format($Monto,2,'.',','),0,0,'R',true);
-	
 	$Suma += $Monto;
-	$Linea += 5;
-	
-	if ($Linea >= 250)
+
+	if ($mbFondo == 0)
 	{
-		$Linea=33;
-		$pdf->AddPage();
+		$msHTML .= "<tr>";
+		$msHTML .= '<td style="width: 10%;">' . $Celular . "</td>";
+		$msHTML .= '<td style="width: 40%;">' . $Estudiante . "</td>";
+		$msHTML .= '<td style="width: 40%;">' . $Concepto . "</td>";
+		$msHTML .= '<td style="width: 10%; text-align: right;">' . number_format($Monto,2,'.',',') . "</td>";
+		$msHTML .= "</tr>";
+		$mbFondo = 1;
+	}
+	else
+	{
+		$msHTML .= "<tr>";
+		$msHTML .= '<td class="fondoGris" style="width: 10%;">' . $Celular . "</td>";
+		$msHTML .= '<td class="fondoGris" style="width: 40%;">' . $Estudiante . "</td>";
+		$msHTML .= '<td class="fondoGris" style="width: 40%;">' . $Concepto . "</td>";
+		$msHTML .= '<td class="fondoGris" style="width: 10%; text-align: right;">' . number_format($Monto,2,'.',',') . "</td>";
+		$msHTML .= "</tr>";
+		$mbFondo = 0;
 	}
 }
+$msHTML .= "</tbody>";
+$msHTML .= "</table>";
+$msHTML .= "<h3>Total por cobrar: " . number_format($Suma,2,'.',',') . "</h3>";
 
-$pdf->SetFont('arial','B',9);
-$pdf->SetFillColor(0,100,255);
-$pdf->SetTextColor(255,255,255);
-$pdf->SetXY(15,$Linea);
-$pdf->Cell(160,6,"Totales (U$)",0,0,'R',true);
-$pdf->SetXY(175,$Linea);
-$pdf->Cell(25,6,number_format($Suma,2,'.',','),0,0,'R',true);
+$pdf->SetXY(15, 27);
+$pdf->writeHTML($msHTML);
 $pdf->Output();
 }
 ?>
