@@ -186,7 +186,7 @@
 					$Motivo = "";
 					$Medio = "";
 					$FuenteIngreso = 0;
-					$PrimeraVez = 0;
+					$PrimeraVez = 1;
 					$CertDigital = 0;
 					$Estado = 0;
 				}

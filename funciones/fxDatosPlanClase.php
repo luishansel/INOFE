@@ -1,8 +1,9 @@
 <?php
 require_once ("fxGeneral.php");
 require_once ("fxPlanClase.php");
-    
-if (isset($_POST["modulosCurso"]) and isset($_POST["modulosDocente"]) and isset($_POST["mbAdministrador"]) and isset($_POST["mnTipo"])) //Devuelve los Módulos de un Curso
+
+//Devuelve los Módulos de un Curso
+if (isset($_POST["modulosCurso"]) and isset($_POST["modulosDocente"]) and isset($_POST["mbAdministrador"]) and isset($_POST["mnTipo"])) 
 {
 	$m_cnx_MySQL = fxAbrirConexion();
 	$codCurso = $_POST["modulosCurso"];
@@ -10,6 +11,12 @@ if (isset($_POST["modulosCurso"]) and isset($_POST["modulosDocente"]) and isset(
 	$Administrador = intval($_POST["mbAdministrador"]);
 	$mnTipo = intval($_POST["mnTipo"]);
 	$msResultado = "";
+
+	$msConsulta = "select FECHAINI_020 from KDSA020A where CURSO_REL = ?";
+	$mDatos = $m_cnx_MySQL->prepare($msConsulta);
+	$mDatos->execute([$codCurso]);
+	$Fila = $mDatos->fetch();
+	$mdFecha = $Fila["FECHAINI_020"];
 
 	if ($Administrador == 1 or $codDocente == "")
 	{
@@ -43,7 +50,8 @@ if (isset($_POST["modulosCurso"]) and isset($_POST["modulosDocente"]) and isset(
 			$msResultado .= "<option value='" . $Valor . "'>" . $Texto . "</option>";
 		}
 	}
-	echo($msResultado);
+	$msRespuesta = array('combo'=>$msResultado, 'fecha'=>$mdFecha);
+	echo json_encode($msRespuesta);
 }
 
 

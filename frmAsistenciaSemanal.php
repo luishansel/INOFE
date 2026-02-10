@@ -43,7 +43,7 @@
             <div id="DivContenido">
 			<div class = "row">
 				<div class="col-xs-12 col-md-11">
-					<div class="degradado"><strong>Asistencia por período</strong></div>
+					<div class="degradado"><strong>Asistencia por perÃ­odo</strong></div>
 				</div>
 			</div>
 

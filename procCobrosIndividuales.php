@@ -117,7 +117,7 @@
                     <form id="gridCobros" name="gridCobros" action="procCobrosIndividuales.php" method="post">
                         <div class="form-group row" style="margin-top:1%">
 							<div class="col-md-12">
-								<label for="cboAnno" class="col-sm-12 col-md-2 col-form-label">Año</label>
+								<label for="cboAnno" class="col-sm-12 col-md-2 col-form-label">AÃ±o</label>
 								<select class="form-control col-sm-12 col-md-2" id="cboAnno" name="cboAnno" onchange="this.form.submit()">
 									<?php
 										$msConsulta = "select distinct year(FECHA_030) as ANNO from KDSA030A order by year(FECHA_030) desc";

@@ -42,7 +42,7 @@
             <div id="DivContenido">
 			<div class = "row">
 				<div class="col-xs-12 col-md-11">
-					<div class="degradado"><strong>Próximos pagos de los estudiantes</strong></div>
+					<div class="degradado"><strong>PrÃ³ximos pagos de los estudiantes</strong></div>
 				</div>
 			</div>
             <div class="row">

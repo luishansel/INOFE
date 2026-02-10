@@ -42,7 +42,7 @@
 				<div id="DivContenido">
 				<div class = "row">
 					<div class="col-xs-12 col-md-11">
-						<div class="degradado"><strong>Bit·cora</strong></div>
+						<div class="degradado"><strong>Bit√°cora</strong></div>
 					</div>
 				</div>
 

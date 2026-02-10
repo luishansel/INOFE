@@ -95,7 +95,8 @@ $pdf->setPrintFooter(false);
 $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
 
 // set auto page breaks
-$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+//$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM); LHVG20260130
+$pdf->SetAutoPageBreak(FALSE, PDF_MARGIN_BOTTOM);
 
 // set some language-dependent strings (optional)
 if (@file_exists(dirname(__FILE__).'/lang/spa.php')) {
@@ -171,7 +172,7 @@ if ($mnRegistros > 0) //Existen estudiantes para certificar
 		$mnRegistro = $mnUltimoRegistro; //Se incrementa al guardar el detalle del acta
 
 		if ($mbCertificar == 1)
-			$mdFechaActa = $msFechaIni;
+			$mdFechaActa = $msFechaFin;
 		else
 			$mdFechaActa = date("Y-m-d");
 		

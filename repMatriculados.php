@@ -245,6 +245,7 @@ else
 			}
 			$NombreCompleto = mb_convert_encoding(html_entity_decode($Fila["NOMBRECOMPLETO"]), "UTF-8");
 
+			//Pagos individuales
 			$msConsulta = "SELECT RECIBO_040 FROM KDSA040A, KDSA041A, KDSA050A where KDSA040A.PAGO_REL = KDSA041A.PAGO_REL ";
 			$msConsulta .= "and KDSA041A.COBRO_REL = KDSA050A.COBRO_REL and TIPO_050 = 2 and KDSA041A.MATRICULA_REL = ? ";
 			$msConsulta .= "order by KDSA040A.PAGO_REL DESC LIMIT 1";
@@ -252,7 +253,48 @@ else
 			$mAuxiliar->execute([$Matricula]);
 			$mnReg = $mAuxiliar->rowCount();
 			if ($mnReg == 0)
-				$Recibo = "";
+			{
+				//Pagos empresariales
+				$msConsulta = "SELECT RECIBO_040 FROM KDSA040A, KDSA042A, KDSA053A where KDSA040A.PAGO_REL = KDSA042A.PAGO_REL and ";
+				$msConsulta .= "KDSA042A.COBRO_REL = KDSA053A.COBRO_REL and KDSA053A.MATRICULA_REL = ? order by KDSA040A.PAGO_REL DESC LIMIT 1";
+				$mAuxiliar = $m_cnx_MySQL->prepare($msConsulta);
+				$mAuxiliar->execute([$Matricula]);
+				$mnReg = $mAuxiliar->rowCount();
+
+				if ($mnReg == 0)
+				{
+					//Becados
+					$msConsulta = "SELECT BECADOPOR_030 FROM KDSA030A WHERE MATRICULA_REL = ? AND BECADO_030 = 1";
+					$mAuxiliar = $m_cnx_MySQL->prepare($msConsulta);
+					$mAuxiliar->execute([$Matricula]);
+					$mnReg = $mAuxiliar->rowCount();
+
+					if ($mnReg == 0)
+					{
+						//Reingreso
+						$msConsulta = "SELECT PRIMERAVEZ_030 FROM KDSA030A WHERE MATRICULA_REL = ?";
+						$mAuxiliar = $m_cnx_MySQL->prepare($msConsulta);
+						$mAuxiliar->execute([$Matricula]);
+						$mRow = $mAuxiliar->fetch();
+						$mnPrimero = $mRow["PRIMERAVEZ_030"];
+
+						if ($mnPrimero == 1)
+							$Recibo = "";
+						else
+							$Recibo = "Reingreso";
+					}
+					else
+					{
+						$mrAux = $mAuxiliar->fetch();
+						$Recibo = "Becado por " . trim($mrAux["BECADOPOR_030"]);
+					}
+				}
+				else
+				{
+					$mrAux = $mAuxiliar->fetch();
+					$Recibo = $mrAux["RECIBO_040"];
+				}
+			}
 			else
 			{
 				$mrAux = $mAuxiliar->fetch();

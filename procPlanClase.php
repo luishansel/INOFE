@@ -278,9 +278,14 @@
                                             echo('<input type="date" class="form-control" id="dtpFecha" name="dtpFecha" value="' . date("Y-m-d") . '" readonly />');
                                         else
                                             echo('<input type="date" class="form-control" id="dtpFecha" name="dtpFecha" value="' . $Fecha . '" readonly />');
+                                        
+                                        $msConsulta = "select FECHAINI_020 from KDSA020A where CURSO_REL = ?";
+                                        $mDatos = $m_cnx_MySQL->prepare($msConsulta);
+                                        $mDatos->execute([$codCurso]);
+                                        $Fila = $mDatos->fetch();
+                                        $mdFecha = $Fila["FECHAINI_020"];
+                                        echo('<input type="date" class="form-control d-none" id="dtpFechaIni" name="dtpFechaIni" value="' . $mdFecha . '" />');
                                         ?>
-                                    </div>
-                                    <div class="col-auto">
                                     </div>
                                 </div>
 
@@ -753,6 +758,29 @@ function verificarFormulario() {
         $.messager.alert('KDSA', 'Las calificaciones están incompletas. No podrá guardar la Planificación de Clases hasta que ingrese las calificaciones de los módulos anteriores.', 'warning');
         return false;
     }
+
+    if (document.getElementById('cboFechaClase').value != document.getElementById('dtpFechaIni').value)
+    {
+        if (document.getElementById('txtCodPlanClase').value == "")
+        {
+            if (administrador == 0 && academico == 0)
+            {
+                const MILISEGUNDOS_POR_DIA = 1000 * 60 * 60 * 24;
+                var fechaClase = new Date(document.getElementById('cboFechaClase').value + "T00:00:00");
+                var milisegundosFechaClase = fechaClase.getTime();
+                var milisegundosFechaHoy = fechaHoy.getTime();
+                var diferenciaMilisegundos = milisegundosFechaHoy - milisegundosFechaClase;
+                var dias = Math.round(diferenciaMilisegundos / MILISEGUNDOS_POR_DIA);
+
+                dias = Math.floor(dias);
+                if (dias > -2)
+                {
+                    $.messager.alert('INOFE', 'La Planificación no puede ingresarse porque faltan menos de dos días para impartir la clase.', 'warning');
+                    return false;
+                }
+            }
+        }
+    }
 /*
     if (administrador == 0 && academico == 0)
     {
@@ -841,7 +869,9 @@ function llenaModulos (curso, administrador)
         processData: false,
         success: function(response){
             var modulo;
-            document.getElementById('cboModulo').innerHTML = response
+            var data = JSON.parse(response);
+            document.getElementById('cboModulo').innerHTML = data.combo;
+            document.getElementById('dtpFechaIni').value = data.fecha;
             modulo = document.getElementById('cboModulo').value;
             funcionFechas(modulo);
         }
