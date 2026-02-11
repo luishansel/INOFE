@@ -1163,12 +1163,12 @@ function appendARCH() {
     var mbExisteArchivo = false;
 
     if (msPlanClase == ""){
-        $.messager.alert('KDSA', 'Guarde primero el plan de clase y luego suba los archivos.', 'warning');
+        $.messager.alert('INOFE', 'Guarde primero el plan de clase y luego suba los archivos.', 'warning');
         return false;
     }
 
     if (msArchivo == ""){
-        $.messager.alert('KDSA', 'No ha seleccionado el archivo.', 'warning');
+        $.messager.alert('INOFE', 'No ha seleccionado el archivo.', 'warning');
         return false;
     }
 
@@ -1209,14 +1209,14 @@ function appendARCH() {
                     $('#dgARCH').datagrid('reload');
                     document.getElementById('fbArchivo').value = "";
                 } else {
-                    $.messager.alert('KDSA', 'Error en la subida del archivo.', 'warning');
+                    $.messager.alert('INOFE', 'Error en la subida del archivo.', 'warning');
                 }
             }
         });
         return false;   
     }
     else
-        $.messager.alert('KDSA', 'El archivo ya ha sido ingresado.', 'warning');
+        $.messager.alert('INOFE', 'El archivo ya ha sido ingresado.', 'warning');
 }
 
 function removeitARCH() {
@@ -1245,7 +1245,7 @@ function removeitARCH() {
                 $('#dgARCH').datagrid({data: datos});
                 $('#dgARCH').datagrid('reload');
             } else {
-                $.messager.alert('KDSA', 'Error en la eliminación del archivo.', 'warning');
+                $.messager.alert('INOFE', 'Error en la eliminación del archivo.', 'warning');
             }
         }
     });

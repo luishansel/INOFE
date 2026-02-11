@@ -204,8 +204,8 @@ if (is_array($_FILES) && count($_FILES) > 0) {
 	$msPlanClase = $_POST["txtPlanClase"];
 	$mnTipo = $_POST["optTipo"];
 	$msArchivo = $_FILES['archivo']['name'];
-	//$msRuta = "https://appadmin.capacitacionkdsa.com/planClase/".$msPlanClase."/".$_FILES['archivo']['name'];
-	$msRuta = "https://appdocente.capacitacionkdsa.com/planClase/".$msPlanClase."/".$_FILES['archivo']['name'];
+	$msRuta = "https://appadmin.institutoinofe.com/planClase/".$msPlanClase."/".$_FILES['archivo']['name'];
+	//$msRuta = "https://appdocente.institutoinofe.com/planClase/".$msPlanClase."/".$_FILES['archivo']['name'];
 	$miCarpeta = '../planClase/'.$msPlanClase;
 	if (!file_exists($miCarpeta)) {
 		mkdir($miCarpeta, 0777, true);
