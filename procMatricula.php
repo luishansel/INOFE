@@ -264,7 +264,7 @@
                                         $Valor = rtrim($Fila["CURSO_REL"]);
                                         $Texto = rtrim($Fila["NOMBRE_020"]) . " (" . rtrim($Fila["CONVOCATORIA_020"]) . " / G" . rtrim($Fila["GRUPO_020"]) . ")";
 										$Activo = $Fila["ACTIVO_020"];
-										if ($Maximo == -1) {$Maximo = $Fila["MAXIMO_020"];}
+										$Maximo = $Fila["MAXIMO_020"];
 										
 										if ($Codigo == "")
 										{
@@ -289,9 +289,15 @@
                                     }
                                 ?>
                             </select>
-							<input type="hidden" class="form-control" id="txnDisponible" name="txnDisponible" value="0" />
                         </div>
                     </div>
+
+					<div class = "form-group row">
+						<label for="txnDisponible" class="col-sm-12 col-md-3 col-form-label">Cupos diponibles</label>
+						<div class="col-sm-12 col-md-2">
+							<input type="number" class="form-control" id="txnDisponible" name="txnDisponible" value="0" readonly/>
+						</div>
+					</div>
 
 					<div class="form-group row">
 						<label for="cboTipoAsistencia" class="col-sm-12 col-md-3 col-form-label">Tipo de asistencia</label>
@@ -350,16 +356,12 @@
                         <div class="col-sm-12 col-md-7">
 							<?php echo('<input type="text" class="form-control" id="txtMotivo" name="txtMotivo" value="' . $Motivo . '" />'); ?>
                         </div>
-                        <div class="col-auto">
-                        </div>
                     </div>
                     
                     <div class = "form-group row">
 						<label for="txtMedio" class="col-sm-12 col-md-3 col-form-label">Medio por el cual se enteró</label>
                         <div class="col-sm-12 col-md-7">
 							<?php echo('<input type="text" class="form-control" id="txtMedio" name="txtMedio" value="' . $Medio . '" />'); ?>
-                        </div>
-                        <div class="col-auto">
                         </div>
                     </div>
                     
