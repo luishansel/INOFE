@@ -354,4 +354,31 @@
 		$mDatos->execute([$msCurso]);
 		return $mDatos;
 	}
+
+	/**Documentos obligatorios de los cursos (KDSA024A)**/
+	function fxGuardarDetDocObligatorio($msCurso, $mnDocumento, $msArchivo, $msRuta)
+	{
+		$m_cnx_MySQL = fxAbrirConexion();
+		$msConsulta = "insert into KDSA024A (CURSO_REL, DOCUMENTO_REL, ARCHIVO_024, RUTA_024) ";
+		$msConsulta .= "values (?, ?, ?, ?)";
+		$mDatos = $m_cnx_MySQL->prepare($msConsulta);
+		$mDatos->execute([$msCurso, $mnDocumento, $msArchivo, $msRuta]);
+	}
+
+	function fxBorrarDetDocObligatorio($msCurso)
+	{
+		$m_cnx_MySQL = fxAbrirConexion();
+		$msConsulta = "delete from KDSA024A where CURSO_REL = ? ";
+		$mDatos = $m_cnx_MySQL->prepare($msConsulta);
+		$mDatos->execute([$msCurso]);
+	}
+
+	function fxDevuelveDetDocObligatorio($msCurso)
+	{
+		$m_cnx_MySQL = fxAbrirConexion();
+		$msConsulta = "select CURSO_REL, DOCUMENTO_REL, ARCHIVO_024, RUTA_024 from KDSA024A where CURSO_REL = ?";
+		$mDatos = $m_cnx_MySQL->prepare($msConsulta);
+		$mDatos->execute([$msCurso]);
+		return $mDatos;
+	}
 ?>

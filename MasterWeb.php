@@ -154,6 +154,7 @@
                             <!--li><a href="hrrCobroIndividual.php">Ajuste de Cobros individuales</a></li-->
                             <li><a href="gridFirmas.php">Firmas para constancia de alumno</a></li>
                             <li><a href="hrrCobros.php">Envío masivo de cobros</a></li>
+                            <li><a href="gridDocCurso.php">Documentos obligatorios de los cursos</a></li>
                         </ul>
                     </li>
 

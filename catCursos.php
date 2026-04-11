@@ -42,9 +42,9 @@
 		{
 			if (isset($_POST["txtCodCurso"]))
 			{
-				$Codigo = $_POST["txtCodCurso"];
+				$msCodigo = $_POST["txtCodCurso"];
 				$CursoInatec = $_POST["cboCursoInatec"];
-				$Nombre = htmlentities($_POST["txtNomCurso"]);
+				$Nombre = $_POST["txtNomCurso"];
 				$FechaIni = $_POST["dtpFechaIni"];
 				$FechaFin = $_POST["dtpFechaFin"];
                 $HoraIni = $_POST["dtpHoraIni"];
@@ -76,12 +76,14 @@
                     $gridModulos = $_POST["gridModulos"];
                 if (isset($_POST["gridFeriados"]))
                     $gridFeriados = $_POST["gridFeriados"];
+                if (isset($_POST["gridDocumentos"]))
+                    $gridDocumentos = $_POST["gridDocumentos"];
 
 				{
-					if ($Codigo == "")
+					if ($msCodigo == "")
 					{
-						$Codigo = fxGuardarCursos ($CursoInatec, $Nombre, $FechaIni, $FechaFin, $HoraIni, $HoraFin, $Domingo, $Lunes, $Martes, $Miercoles, $Jueves, $Viernes, $Sabado, $Tipo, $TipoAsistencia, $Turno, $Convocatoria, $Grupo, $Moneda, $ValorCurso, $Matricula, $Cuota, $Certificacion, $Mora, $Maximo, $Activo, $Certificar, $CertDigital);
-                        fxAgregarBitacora ($_SESSION["gsUsuario"], "KDSA020A", $Codigo, "", "Agregar");
+						$msCodigo = fxGuardarCursos ($CursoInatec, $Nombre, $FechaIni, $FechaFin, $HoraIni, $HoraFin, $Domingo, $Lunes, $Martes, $Miercoles, $Jueves, $Viernes, $Sabado, $Tipo, $TipoAsistencia, $Turno, $Convocatoria, $Grupo, $Moneda, $ValorCurso, $Matricula, $Cuota, $Certificacion, $Mora, $Maximo, $Activo, $Certificar, $CertDigital);
+                        fxAgregarBitacora ($_SESSION["gsUsuario"], "KDSA020A", $msCodigo, "", "Agregar");
 
 						if ($Matricula > 0) //Cobro de la Matrícula
 						{
@@ -101,14 +103,32 @@
 									break;
 								case 4:
 									$Concepto = "Matrícula del Diplomado " . trim($Nombre);
-									break;
+                                    break;
+                                case 5:
+                                    $Concepto = "Matrícula del Webinar " . trim($Nombre);
+                                    break;
+                                case 6:
+                                    $Concepto = "Matrícula del Workshop " . trim($Nombre);
+                                    break;
+                                case 7:
+                                    $Concepto = "Matrícula del Teambuilding " . trim($Nombre);
+                                    break;
+                                case 8:
+                                    $Concepto = "Matrícula del Bootcamp " . trim($Nombre);
+                                    break;
+                                case 9:
+                                    $Concepto = "Matrícula del Programa " . trim($Nombre);
+                                    break;
+                                case 10:
+                                    $Concepto = "Matrícula del Masterclass " . trim($Nombre);
+                                    break;
 							}
 
-							$Cobro = fxGuardarCobros ($Codigo, $FechaIni, $Concepto, $Matricula, $Moneda, 2, 1);
+							$Cobro = fxGuardarCobros ($msCodigo, $FechaIni, $Concepto, $Matricula, $Moneda, 2, 1);
 							fxAgregarBitacora ($_SESSION["gsUsuario"], "KDSA050A", $Cobro, "", "Agregar");
 						}
 
-						if ($Tipo == 1 || $Tipo == 2 || $Tipo == 4) //Cobro de la Primera Cuota y la Primera Mora
+						if ($Tipo == 1 || $Tipo == 2 || $Tipo == 4 || $Tipo == 8 || $Tipo == 9 || $Tipo == 10) //Cobro de la Primera Cuota y la Primera Mora
 						{
 							switch ($Tipo)
 							{
@@ -120,10 +140,19 @@
 									break;
 								case 4:
 									$Concepto = "Cuota N° 1 del Diplomado " . trim($Nombre);
+                                    break;
+                                case 8:
+									$Concepto = "Cuota N° 1 del Bootcamp " . trim($Nombre);
+									break;
+								case 9:
+									$Concepto = "Cuota N° 1 del Programa " . trim($Nombre);
+									break;
+								case 10:
+									$Concepto = "Cuota N° 1 de la Masterclass " . trim($Nombre);
 									break;
 							}
 							
-							$Cobro = fxGuardarCobros ($Codigo, $FechaIni, $Concepto, $Cuota, $Moneda, 0, 1);
+							$Cobro = fxGuardarCobros ($msCodigo, $FechaIni, $Concepto, $Cuota, $Moneda, 0, 1);
 							fxAgregarBitacora ($_SESSION["gsUsuario"], "KDSA050A", $Cobro, "", "Agregar");
 
 							switch ($Tipo)
@@ -136,12 +165,21 @@
 									break;
 								case 4:
 									$Concepto = "Mora de la Cuota N° 1 del Diplomado " . trim($Nombre);
+                                    break;
+                                case 8:
+									$Concepto = "Mora de la Cuota N° 1 del Bootcamp " . trim($Nombre);
+									break;
+								case 9:
+									$Concepto = "Mora de la Cuota N° 1 del Programa " . trim($Nombre);
+									break;
+								case 10:
+									$Concepto = "Mora de la Cuota N° 1 de la Masterclass " . trim($Nombre);
 									break;
 							}
 						
 							$CuotaMora = $Cuota * ($Mora / 100);
                             $FechaMora = date("Y-m-d", strtotime($FechaIni . "+1 days"));
-							fxGuardarCobros ($Codigo, $FechaMora, $Concepto, $CuotaMora, $Moneda, 1, 1, $Cobro);
+							fxGuardarCobros ($msCodigo, $FechaMora, $Concepto, $CuotaMora, $Moneda, 1, 1, $Cobro);
 							fxAgregarBitacora ($_SESSION["gsUsuario"], "KDSA050A", $Cobro, "", "Agregar");
                         }
 
@@ -155,14 +193,25 @@
                                 $fechaIniMod = $Registro['fechaIni'];
                                 $fechaFinMod = $Registro['fechaFin'];
                                 $valor = $Registro['valor'];
-                                fxGuardarDetModulo ($Codigo, $docenteModGrid, $numeroModGrid, $nombreMod, $fechaIniMod, $fechaFinMod, $valor);
+                                fxGuardarDetModulo ($msCodigo, $docenteModGrid, $numeroModGrid, $nombreMod, $fechaIniMod, $fechaFinMod, $valor);
+                            }
+                        }
+
+                        if (isset($_POST["gridDocumentos"]))
+                        {
+                            foreach($gridDocumentos as $Registro)
+                            {
+                                $documento = $Registro['documento'];
+                                $archivo = $Registro['archivo'];
+                                $ruta = $Registro['ruta'];
+                                fxGuardarDetDocumento ($msCodigo, $documento, $archivo, $ruta);
                             }
                         }
 					}
 					else
 					{
-						fxModificarCursos ($Codigo, $CursoInatec, $Nombre, $FechaIni, $FechaFin, $HoraIni, $HoraFin, $Domingo, $Lunes, $Martes, $Miercoles, $Jueves, $Viernes, $Sabado, $Tipo, $TipoAsistencia, $Turno, $Convocatoria, $Grupo, $Moneda, $ValorCurso, $Matricula, $Cuota, $Certificacion, $Mora, $Maximo, $Activo, $Certificar, $CertDigital, $CerradoAntes);
-                        fxAgregarBitacora ($_SESSION["gsUsuario"], "KDSA020A", $Codigo, "", "Modificar");
+						fxModificarCursos ($msCodigo, $CursoInatec, $Nombre, $FechaIni, $FechaFin, $HoraIni, $HoraFin, $Domingo, $Lunes, $Martes, $Miercoles, $Jueves, $Viernes, $Sabado, $Tipo, $TipoAsistencia, $Turno, $Convocatoria, $Grupo, $Moneda, $ValorCurso, $Matricula, $Cuota, $Certificacion, $Mora, $Maximo, $Activo, $Certificar, $CertDigital, $CerradoAntes);
+                        fxAgregarBitacora ($_SESSION["gsUsuario"], "KDSA020A", $msCodigo, "", "Modificar");
 
                         //Modifica el estado de las Matrículas al cambiar el estado del Curso. Funciona para cursos que no alcanzaron el mínimo de estudiantes.
                         $msConsulta = "select MATRICULA_REL, ESTUDIANTE_REL, TIPOASISTENCIA_030, FECHA_030, DESCUENTO_030, MOTIVO_030, MEDIO_030, FUENTEINGRESO_030, ";
@@ -173,7 +222,7 @@
                             $msConsulta .= "and ESTADO_030 = 5"; //Baja
 
                         $mAuxiliar = $m_cnx_MySQL->prepare($msConsulta);
-					    $mAuxiliar->execute([$Codigo]);
+					    $mAuxiliar->execute([$msCodigo]);
 
                         while ($auxFila = $mAuxiliar->fetch())
                         {
@@ -193,12 +242,12 @@
                             $mDocAcademico = $auxFila["DOCACADEMICO_030"];
 
                             if ($Activo == 0)
-                                fxModificarMatricula($mMatricula, $mEstudiante, $Codigo, $mTipoAsistencia, $mFecha, $mDescuento, $mMotivo, $mMedio, $mFuenteIngreso, $mPrimeraVez, $mBecado, $mBecadoPor, $mInatec, $mDocIdentidad, $mDocAcademico, 5);
+                                fxModificarMatricula($mMatricula, $mEstudiante, $msCodigo, $mTipoAsistencia, $mFecha, $mDescuento, $mMotivo, $mMedio, $mFuenteIngreso, $mPrimeraVez, $mBecado, $mBecadoPor, $mInatec, $mDocIdentidad, $mDocAcademico, 5);
                             else
-                                fxModificarMatricula($mMatricula, $mEstudiante, $Codigo, $mTipoAsistencia, $mFecha, $mDescuento, $mMotivo, $mMedio, $mFuenteIngreso, $mPrimeraVez, $mBecado, $mBecadoPor, $mInatec, $mDocIdentidad, $mDocAcademico, 0);
+                                fxModificarMatricula($mMatricula, $mEstudiante, $msCodigo, $mTipoAsistencia, $mFecha, $mDescuento, $mMotivo, $mMedio, $mFuenteIngreso, $mPrimeraVez, $mBecado, $mBecadoPor, $mInatec, $mDocIdentidad, $mDocAcademico, 0);
                         }
 
-                        $mDatos = fxDevuelveDetModulo($Codigo);
+                        $mDatos = fxDevuelveDetModulo($msCodigo);
                         $numRegistros = $mDatos->rowCount();
 
                         if (isset($gridModulos))
@@ -211,7 +260,7 @@
                         {
                             $numeroModGrid = $gridModulos[$i]['numero'];
                             $docenteModGrid = $gridModulos[$i]['codDocente'];
-                            $codigoModGrid = $gridModulos[$i]['modulo'];
+                            $CodigoModGrid = $gridModulos[$i]['modulo'];
                             $nombreMod = $gridModulos[$i]['nombre'];
                             $fechaIniMod = $gridModulos[$i]['fechaIni'];
                             $fechaFinMod = $gridModulos[$i]['fechaFin'];
@@ -219,7 +268,7 @@
 
                             $msConsulta = "select MODULO_REL from KDSA021A where DOCENTE_REL = ? and CURSO_REL = ? and NUMERO_021 = ?";
                             $mAuxiliar = $m_cnx_MySQL->prepare($msConsulta);
-					        $mAuxiliar->execute([$docenteModGrid, $Codigo, $numeroModGrid]);
+					        $mAuxiliar->execute([$docenteModGrid, $msCodigo, $numeroModGrid]);
                             $numAuxiliar = $mAuxiliar->rowCount();
                             
                             if ($numAuxiliar == 0)
@@ -231,9 +280,9 @@
                             }
 
                             if ($msCodModulo == "" and $codigoModGrid == "")
-                                fxGuardarDetModulo ($Codigo, $docenteModGrid, $numeroModGrid, $nombreMod, $fechaIniMod, $fechaFinMod, $valor);
+                                fxGuardarDetModulo ($msCodigo, $docenteModGrid, $numeroModGrid, $nombreMod, $fechaIniMod, $fechaFinMod, $valor);
                             else
-                                fxModificarDetModulo ($msCodModulo, $Codigo, $docenteModGrid, $numeroModGrid, $nombreMod, $fechaIniMod, $fechaFinMod, $valor);
+                                fxModificarDetModulo ($msCodModulo, $msCodigo, $docenteModGrid, $numeroModGrid, $nombreMod, $fechaIniMod, $fechaFinMod, $valor);
                         }
                         
                         //Verifica los registros de la Base en el Grid
@@ -264,11 +313,11 @@
                             {
                                 $fechaFer = $Registro['fecha'];
                                 $diaFer = $Registro['dia'];
-                                fxBorrarDetFeriado ($Codigo, $fechaFer);
+                                fxBorrarDetFeriado ($msCodigo, $fechaFer);
                             }
                         }
 
-                        fxVerificarDetFeriado($Codigo);
+                        fxVerificarDetFeriado($msCodigo);
                     }
                     
                     if (isset($_POST["gridFeriados"]))
@@ -279,24 +328,37 @@
                             $fechaFer = $Registro['fecha'];
                             $diaFer = $Registro['dia'];
                             $motivoFer = $Registro['motivo'];
-                            fxGuardarDetFeriado ($Codigo, $itemId, $fechaFer, $diaFer, $motivoFer);
+                            fxGuardarDetFeriado ($msCodigo, $itemId, $fechaFer, $diaFer, $motivoFer);
                             $itemId++;
+                        }
+                    }
+
+                    fxBorrarDetDocObligatorio($msCodigo);
+
+                    if (isset($_POST["gridDocumentos"]))
+                    {
+                        foreach($gridDocumentos as $Registro)
+                        {
+                            $documento = $Registro['documento'];
+                            $archivo = $Registro['archivo'];
+                            $ruta = $Registro['ruta'];
+                            fxGuardarDetDocumento ($msCodigo, $documento, $archivo, $ruta);
                         }
                     }
 				}
 				?>
-<meta http-equiv="Refresh" content="0;url=gridCursos.php" /><?php
+            <meta http-equiv="Refresh" content="0;url=gridCursos.php" /><?php
 			}
 			else
 			{
                 if (isset($_POST["KDSA"]))
-				    $Codigo = $_POST["KDSA"];
+				    $msCodigo = $_POST["KDSA"];
                 else
-                    $Codigo = "";
+                    $msCodigo = "";
 
-				if ($Codigo != "")
+				if ($msCodigo != "")
                 {
-                    $RecordSet = fxDevuelveCursos(0, $Codigo);
+                    $RecordSet = fxDevuelveCursos(0, $msCodigo);
                     $Fila = $RecordSet->fetch();
                     $CursoInatec = $Fila["CURSOINATEC_REL"];
                     $Nombre = $Fila["NOMBRE_020"];
@@ -386,7 +448,7 @@
                                 <div class="form-group row">
                                     <label for="txtCodCurso" class="col-sm-12 col-md-3 col-form-label">Código del Curso</label>
                                     <div class="col-sm-12 col-md-3">
-                                        <?php echo('<input type="text" class="form-control" id="txtCodCurso" name="txtCodCurso" value="' . $Codigo . '" readonly />'); ?>
+                                        <?php echo('<input type="text" class="form-control" id="txtCodCurso" name="txtCodCurso" value="' . $msCodigo . '" readonly />'); ?>
                                     </div>
                                 </div>
 
@@ -410,7 +472,7 @@
 													$Valor = rtrim($Fila["CURSOINATEC_REL"]);
 													$Texto = rtrim($Fila["NOMBRE_070"]);
 													$mbActivo = $Fila["ACTIVO_070"];
-													if ($Codigo == "")
+													if ($msCodigo == "")
 													{
 														if ($mbActivo == 1)
 															echo("<option value='" . $Valor . "'>" . $Texto . "</option>");
@@ -440,7 +502,7 @@
                                     <label for="dtpFechaIni" class="col-sm-12 col-md-3 col-form-label">Fecha inicial</label>
                                     <div class="col-sm-12 col-md-3">
                                         <?php
-										if ($Codigo == "")
+										if ($msCodigo == "")
                                             echo('<input type="date" class="form-control" id="dtpFechaIni" name="dtpFechaIni" value="' . date("Y-m-d") . '" onchange="Convocatoria()" />');
 										else
 											echo('<input type="date" class="form-control" id="dtpFechaIni" name="dtpFechaIni" value="' . $FechaIni . '" onchange="Convocatoria()" />');
@@ -452,7 +514,7 @@
                                     <label for="dtpFechaFin" class="col-sm-12 col-md-3 col-form-label">Fecha final</label>
                                     <div class="col-sm-12 col-md-3">
                                         <?php
-                                            if ($Codigo == "")
+                                            if ($msCodigo == "")
                                                 echo('<input type="date" class="form-control" id="dtpFechaFin" name="dtpFechaFin" value="' . date("Y-m-d") . '" />');
                                             else
                                                 echo('<input type="date" class="form-control" id="dtpFechaFin" name="dtpFechaFin" value="' . $FechaFin . '" />');
@@ -464,7 +526,7 @@
                                     <label for="dtpHoraIni" class="col-sm-12 col-md-3 col-form-label">Hora inicial de cada sesión</label>
                                     <div class="col-sm-12 col-md-3">
                                         <?php
-                                            if ($Codigo == "")
+                                            if ($msCodigo == "")
                                                 echo('<input type="time" class="form-control" id="dtpHoraIni" name="dtpHoraIni" value="' . date("H:i") . '" />');
                                             else
                                                 echo('<input type="time" class="form-control" id="dtpHoraIni" name="dtpHoraIni" value="' . date_format($HoraIni, 'H:i') . '" />');
@@ -476,7 +538,7 @@
                                     <label for="dtpHoraFin" class="col-sm-12 col-md-3 col-form-label">Hora final de cada sesión</label>
                                     <div class="col-sm-12 col-md-3">
                                         <?php
-                                            if ($Codigo == "")
+                                            if ($msCodigo == "")
                                                 echo('<input type="time" class="form-control" id="dtpHoraFin" name="dtpHoraFin" value="' . date("H:i") . '" />');
                                             else
                                                 echo('<input type="time" class="form-control" id="dtpHoraFin" name="dtpHoraFin" value="' . date_format($HoraFin, 'H:i') . '" />');
@@ -489,7 +551,7 @@
                                     <div class="col-sm-12 col-md-3">
                                         <select class="form-control" id="cboTipo" name="cboTipo">
                                             <?php
-												if ($Tipo == 0 or $Codigo == "")
+												if ($Tipo == 0 or $msCodigo == "")
 													echo("<option value='0' selected>Seminario</option>");
 												else
 													echo("<option value='0'>Seminario</option>");
@@ -512,7 +574,31 @@
 												if ($Tipo == 4)
 													echo("<option value='4' selected>Diplomado</option>");
 												else
-													echo("<option value='4'>Diplomado</option>");
+                                                    echo("<option value='4'>Diplomado</option>");
+                                                if ($Tipo == 5)
+													echo("<option value='5' selected>Webinar</option>");
+												else
+                                                    echo("<option value='5'>Webinar</option>");
+                                                if ($Tipo == 6)
+													echo("<option value='6' selected>Workshop</option>");
+												else
+                                                    echo("<option value='6'>Workshop</option>");
+                                                if ($Tipo == 7)
+													echo("<option value='7' selected>Teambuilding</option>");
+												else
+                                                    echo("<option value='7'>Teambuilding</option>");
+                                                if ($Tipo == 8)
+													echo("<option value='8' selected>Bootcamp</option>");
+												else
+                                                    echo("<option value='8'>Bootcamp</option>");
+                                                if ($Tipo == 9)
+													echo("<option value='9' selected>Programa</option>");
+												else
+                                                    echo("<option value='9'>Programa</option>");
+                                                if ($Tipo == 10)
+													echo("<option value='10' selected>Masterclass</option>");
+												else
+                                                    echo("<option value='10'>Masterclass</option>");
 											?>
                                         </select>
                                     </div>
@@ -523,7 +609,7 @@
                                     <div class="col-sm-12 col-md-3">
                                         <select class="form-control" id="cboTurno" name="cboTurno">
                                             <?php
-												if ($Turno == 0 or $Codigo == "")
+												if ($Turno == 0 or $msCodigo == "")
 													echo("<option value='0' selected>Nocturno</option>");
 												else
 													echo("<option value='0'>Nocturno</option>");
@@ -557,7 +643,7 @@
                                     <div class="col-sm-12 col-md-3">
                                         <select class="form-control" id="cboTipoAsistencia" name="cboTipoAsistencia">
                                             <?php
-												if ($TipoAsistencia == 0 or $Codigo == "")
+												if ($TipoAsistencia == 0 or $msCodigo == "")
 													echo("<option value='0' selected>Presencial</option>");
 												else
 													echo("<option value='0'>Presencial</option>");
@@ -629,7 +715,7 @@
                                     <label for="txnGrupo" class="col-sm-12 col-md-3 col-form-label">Grupo</label>
                                     <div class="col-sm-12 col-md-2">
                                         <?php
-										if ($Codigo == "")
+										if ($msCodigo == "")
 											echo('<input type="number" style="text-align:right" class="form-control" id="txnGrupo" name="txnGrupo" value="1" />');
 										else
 											echo('<input type="number" style="text-align:right" class="form-control" id="txnGrupo" name="txnGrupo" value="' . $Grupo . '" />');
@@ -642,7 +728,7 @@
 									<div class="col-sm-12 col-md-4">
 										<div class="radio">
 											<?php
-												if ($Moneda == 0 or $Codigo == "")
+												if ($Moneda == 0 or $msCodigo == "")
 													echo ('<input type="radio" id="optMoneda1" name="optMoneda" value="0" checked /> Córdobas ');
 												else
                                                     echo ('<input type="radio" id="optMoneda1" name="optMoneda" value="0" /> Córdobas ');
@@ -660,7 +746,7 @@
                                     <label for="txnValor" class="col-sm-12 col-md-3 col-form-label">Valor del curso</label>
                                     <div class="col-sm-12 col-md-3">
                                         <?php
-										if ($Codigo == "")
+										if ($msCodigo == "")
 											echo('<input type="number" step="0.01" style="text-align:right" class="form-control" id="txnValor" name="txnValor" value="0" />');
 										else
 											echo('<input type="number" step="0.01" style="text-align:right" class="form-control" id="txnValor" name="txnValor" value="' . $ValorCurso . '" />');
@@ -672,7 +758,7 @@
                                     <label for="txnMatricula" class="col-sm-12 col-md-3 col-form-label">Valor de la matrícula</label>
                                     <div class="col-sm-12 col-md-3">
                                         <?php
-										if ($Codigo == "")
+										if ($msCodigo == "")
 											echo('<input type="number" step="0.01" style="text-align:right" class="form-control" id="txnMatricula" name="txnMatricula" value="0" />');
 										else
 											echo('<input type="number" step="0.01" style="text-align:right" class="form-control" id="txnMatricula" name="txnMatricula" value="' . $Matricula . '" />');
@@ -684,7 +770,7 @@
                                     <label for="txnCuota" class="col-sm-12 col-md-3 col-form-label">Valor de la cuota</label>
                                     <div class="col-sm-12 col-md-3">
                                         <?php
-										if ($Codigo == "")
+										if ($msCodigo == "")
 											echo('<input type="number" step="0.01" style="text-align:right" class="form-control" id="txnCuota" name="txnCuota" value="0" />');
 										else
 											echo('<input type="number" step="0.01" style="text-align:right" class="form-control" id="txnCuota" name="txnCuota" value="' . $Cuota . '" />');
@@ -696,7 +782,7 @@
                                     <label for="txnCertificacion" class="col-sm-12 col-md-3 col-form-label">Valor de la certificación</label>
                                     <div class="col-sm-12 col-md-3">
                                         <?php
-										if ($Codigo == "")
+										if ($msCodigo == "")
 											echo('<input type="number" step="0.01" style="text-align:right" class="form-control" id="txnCertificacion" name="txnCertificacion" value="0" />');
 										else
 											echo('<input type="number" step="0.01" style="text-align:right" class="form-control" id="txnCertificacion" name="txnCertificacion" value="' . $Certificacion . '" />');
@@ -708,7 +794,7 @@
                                     <label for="txnMora" class="col-sm-12 col-md-3 col-form-label">Porcentaje por Mora</label>
                                     <div class="col-sm-12 col-md-2">
                                         <?php
-										if ($Codigo == "")
+										if ($msCodigo == "")
 											echo('<input type="number" style="text-align:right" class="form-control" id="txnMora" name="txnMora" value="1" />');
 										else
 											echo('<input type="number" style="text-align:right" class="form-control" id="txnMora" name="txnMora" value="' . $Mora . '" />');
@@ -720,7 +806,7 @@
                                     <label for="txnMaximo" class="col-sm-12 col-md-3 col-form-label">Máximo de estudiantes</label>
                                     <div class="col-sm-12 col-md-2">
                                         <?php
-										if ($Codigo == "")
+										if ($msCodigo == "")
 											echo('<input type="number" style="text-align:right" class="form-control" id="txnMaximo" name="txnMaximo" value="1" />');
 										else
 											echo('<input type="number" style="text-align:right" class="form-control" id="txnMaximo" name="txnMaximo" value="' . $Maximo . '" />');
@@ -733,7 +819,7 @@
                                     <div class="col-sm-12 col-md-4">
                                         <div class="radio">
                                             <?php
-											if ($CerradoAntes == 0 or $Codigo == "")
+											if ($CerradoAntes == 0 or $msCodigo == "")
 												echo('<input type="radio" id="optCerradoAntes1" name="optCerradoAntes" value="0" onchange="cambiaValores()" checked="checked" /><span class="letraGris"> No </span><input type="radio" id="optCerradoAntes2" name="optCerradoAntes" value="1" onchange="cerradoDespues()" /><span class="letraGris"> Si</span>');
 											else
 												echo('<input type="radio" id="optCerradoAntes1" name="optCerradoAntes" value="0" onchange="cambiaValores()" /><span class="letraGris"> No </span><input type="radio" id="optCerradoAntes2" name="optCerradoAntes" value="1" onchange="cerradoDespues()" checked="checked" /><span class="letraGris"> Si</span>');
@@ -747,7 +833,7 @@
                                     <div class="col-sm-12 col-md-4">
                                         <div class="radio">
                                             <?php
-											if ($Activo == 1 or $Codigo == "")
+											if ($Activo == 1 or $msCodigo == "")
 												echo('<input type="radio" id="optActivo1" name="optActivo" value="0" /><span class="letraGris"> No </span><input type="radio" id="optActivo2" name="optActivo" value="1" onchange="verificarCierre()" checked="checked" /><span class="letraGris"> Si</span>');
 											else
 												echo('<input type="radio" id="optActivo1" name="optActivo" value="0" checked="checked" /><span class="letraGris"> No </span><input type="radio" id="optActivo2" name="optActivo" value="1" onchange="verificarCierre()" /><span class="letraGris"> Si</span>');
@@ -761,7 +847,7 @@
                                     <div class="col-sm-12 col-md-4">
                                         <div class="radio">
                                             <?php
-											if ($Certificar == 0 or $Codigo == "")
+											if ($Certificar == 0 or $msCodigo == "")
 												echo('<input type="radio" id="optCertificar1" name="optCertificar" value="0" checked="checked" /> No <input type="radio" id="optCertificar2" name="optCertificar" value="1" onchange="verificarCierre()" /> Si');
 											else
 												echo('<input type="radio" id="optCertificar1" name="optCertificar" value="0" /> No <input type="radio" id="optCertificar2" name="optCertificar" value="1" onchange="verificarCierre()" checked="checked" /> Si');
@@ -775,7 +861,7 @@
                                     <div class="col-sm-12 col-md-4">
                                         <div class="radio">
                                             <?php
-											if ($CertDigital == 0 or $Codigo == "")
+											if ($CertDigital == 0 or $msCodigo == "")
 												echo('<input type="radio" id="optCertDigital1" name="optCertDigital" value="0" checked="checked" /> No <input type="radio" id="optCertDigital2" name="optCertDigital" value="1" /> Si');
 											else
 												echo('<input type="radio" id="optCertDigital1" name="optCertDigital" value="0" /> No <input type="radio" id="optCertDigital2" name="optCertDigital" value="1" checked="checked" /> Si');
@@ -792,12 +878,9 @@
                             <div class="col-xs-auto col-md-12">
                                 <div class="form-group row">
                                     <div class="col-sm-auto col-md-12">
-                                        <?php 
-										$nombreArchivoMOD = fxEscribeJsonModulo($Codigo);
-										?>
                                         <div id="dvMOD">
                                             <table id="dgMOD" class="easyui-datagrid table"
-                                                data-options="iconCls:'icon-edit', toolbar:'#tbMOD', footer:'#ftMOD', singleSelect:true, url:'<?php echo(trim($nombreArchivoMOD)); ?>', method:'get', onClickCell:onClickCellMOD">
+                                                data-options="iconCls:'icon-edit', toolbar:'#tbMOD', footer:'#ftMOD', singleSelect:true, method:'get', onClickCell:onClickCellMOD">
                                                 <thead>
                                                     <tr>
                                                         <th data-options="field:'curso', align:'left', hidden:true">Curso</th>
@@ -860,6 +943,27 @@
                                                         <th data-options="field:'valor',align:'right',editor:{type:'numberbox',options:{precision:2}}">Valor de sesión</th>
                                                     </tr>
                                                 </thead>
+                                                <tbody>
+                                                <?php
+                                                    $mDatos = fxDevuelveDetModulo($msCodigo);
+                                                    while($mFila = $mDatos->fetch())
+                                                    {
+                                                        echo('<tr>');
+                                                        echo('<td>' . rtrim($mFila['CURSO_REL']) . '</td>');
+                                                        echo('<td>' . rtrim($mFila['MODULO_REL']) . '</td>');
+                                                        echo('<td>' . rtrim($mFila['DOCENTE_REL']) . '</td>');
+                                                        echo('<td>' . rtrim($mFila['PLAN']) . '</td>');
+                                                        echo('<td>' . rtrim($mFila['NUMERO_021']) . '</td>');
+                                                        echo('<td>' . rtrim($mFila['NOMBRE_100']) . '</td>');
+                                                        echo('<td>' . rtrim($mFila['NOMBRE_021']) . '</td>');
+                                                        echo('<td>' . rtrim($mFila['FECHAINI_021']) . '</td>');
+                                                        echo('<td>' . rtrim($mFila['FECHAFIN_021']) . '</td>');
+                                                        echo('<td>' . rtrim($mFila['VALOR_021']) . '</td>');
+                                                        
+                                                        echo('</tr>');
+                                                    }
+                                                ?>
+                                                </tbody>
                                             </table>
                                         </div>
                                     </div>
@@ -962,12 +1066,9 @@
                             <div class="col-xs-auto col-md-12">
                                 <div class="form-group row">
                                     <div class="col-sm-auto col-md-12">
-                                        <?php 
-										$nombreArchivoFER = fxEscribeJsonFeriado($Codigo);
-										?>
                                         <div id="dvFER">
                                             <table id="dgFER" class="easyui-datagrid table"
-                                                data-options="iconCls:'icon-edit', toolbar:'#tbFER', footer:'#ftFER', singleSelect:true, url:'<?php echo(trim($nombreArchivoFER)); ?>', method:'get', onClickCell:onClickCellFER">
+                                                data-options="iconCls:'icon-edit', toolbar:'#tbFER', footer:'#ftFER', singleSelect:true, method:'get', onClickCell:onClickCellFER">
                                                 <thead>
                                                     <tr>
                                                         <th data-options="field:'fecha', width:'15%', align:'center'">Fecha</th>
@@ -975,6 +1076,19 @@
                                                         <th data-options="field:'motivo', width:'65%', align:'left'">Motivo</th>
                                                     </tr>
                                                 </thead>
+                                                <tbody>
+                                                <?php
+                                                    $mDatos = fxDevuelveDetFeriado($msCodigo);
+                                                    while($mFila = $mDatos->fetch())
+                                                    {
+                                                        echo('<tr>');
+                                                        echo('<td>' . trim($mFila['FECHA_022']) . '</td>');
+                                                        echo('<td>' . trim($mFila['DIA_022']) . '</td>');
+                                                        echo('<td>' . trim($mFila['MOTIVO_022']) . '</td>');
+                                                        echo('</tr>');
+                                                    }
+                                                ?>
+                                                </tbody>
                                             </table>
                                         </div>
                                     </div>
@@ -991,7 +1105,7 @@
                                                 ?>
                                                 </div>
                                                 <div style="float: right; display: block">
-                                                    <a href="javascript:void(0)" class="easyui-linkbutton" id="cmdFeriado" onclick="preFeriados()">Obtener los Feriados pre-Configurados</a>
+                                                    <a href="javascript:void(0)" class="btn btn-warning" id="cmdFeriado" onclick="preFeriados()">Obtener los Feriados pre-Configurados</a>
                                                 </div>
                                             </td>
                                         </tr>
@@ -1015,6 +1129,71 @@
                             </div>
                         </div>
                         <!--Final del DIV de Feriados-->
+
+                        <div title="Documentos obligatorios" style="padding:10px">
+                            <!--Inicio del DIV de Documentos-->
+                            <div class="col-xs-auto col-md-12">
+                                <div class="form-group row">
+                                    <div class="col-sm-auto col-md-12">
+                                        <div id="dvDOC">
+                                            <table id="dgDOC" class="easyui-datagrid table"
+                                                data-options="iconCls:'icon-edit', toolbar:'#tbDOC', singleSelect:true, method:'get'">
+                                                <thead>
+                                                    <tr>
+                                                        <th data-options="field:'curso', align:'left', hidden:true">Curso</th>
+                                                        <th data-options="field:'documento', align:'left', hidden:true">Consecutivo</th>
+                                                        <th data-options="field:'archivo', width:'40%', align:'left'">Archivo</th>
+                                                        <th data-options="field:'ruta', width:'60%', align:'left'">Ruta del archivo</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                <?php
+                                                    $mDatos = fxDevuelveDetDocObligatorio($msCodigo);
+
+                                                    while($mFila = $mDatos->fetch())
+                                                    {
+                                                        echo('<tr>');
+                                                        echo('<td>' . $mFila["CURSO_REL"] . '</td>');
+                                                        echo('<td>' . $mFila["DOCUMENTO_REL"] . '</td>');
+                                                        echo('<td>' . $mFila["ARCHIVO_024"] . '</td>');
+                                                        echo('<td>' . $mFila["RUTA_024"] . '</td>');
+                                                        echo('</tr>');
+                                                    }
+                                                ?>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="tbDOC" style="height:auto; padding-top:1%; padding-bottom:2%">
+                                    <table width="100%">
+                                        <tr>
+                                            <td width="20%">Archivos pre-cargados</td>
+                                            <td>
+                                                <select class="form-control" id="cboPreDocs" name="cboPreDocs" style="width:100%">
+                                                    <?php
+                                                        $msConsulta = "select DOCCURSO_REL, CURSO_200 from KDSA200A order by CURSO_200";
+                                                        $mDatos = $m_cnx_MySQL->prepare($msConsulta);
+					                                    $mDatos->execute();
+                                                        while ($Fila = $mDatos->fetch())
+                                                        {
+                                                            $Valor = rtrim($Fila["DOCCURSO_REL"]);
+                                                            $Texto = rtrim($Fila["CURSO_200"]);
+                                                            echo("<option value='" . $Valor . "'>" . $Texto . "</option>");
+                                                        }
+                                                    ?>
+                                                </select>
+                                            </td>
+                                            <td width="20%">
+                                                <input type="button" id="Importar" name="Importar" value="Importar" class="btn btn-warning" onclick="llenaDocumentos()" />
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <!--Final del DIV de Documentos-->
                     </div>
                     <!--Final del DIV de Tabs-->
                 </form>
@@ -1031,64 +1210,89 @@
 
 <script>
 function verificarFormulario() {
+    var mnTipo = document.getElementById('cboTipo').value;
+
     if (document.getElementById('txtNomCurso').value == "") {
-        $.messager.alert('INOFE', 'Falta el Nombre del Curso.', 'warning');
+        $.messager.alert('KDSA', 'Falta el Nombre del Curso.', 'warning');
         return false;
     }
 
     if (document.getElementById('dtpFechaIni').value > document.getElementById('dtpFechaFin').value) {
-        $.messager.alert('INOFE', 'La Fecha Inicial es posterior a la Final.', 'warning');
+        $.messager.alert('KDSA', 'La Fecha Inicial es posterior a la Final.', 'warning');
         return false;
     }
 
     if (document.getElementById('dtpHoraIni').value > document.getElementById('dtpHoraFin').value) {
-        $.messager.alert('INOFE', 'La Hora Inicial de la Sesión es posterior a la Final.', 'warning');
+        $.messager.alert('KDSA', 'La Hora Inicial de la Sesión es posterior a la Final.', 'warning');
         return false;
     }
 
     if (document.getElementById('txtConvocatoria').value == "") {
-        $.messager.alert('INOFE', 'Falta la Convocatoria del Curso.', 'warning');
+        $.messager.alert('KDSA', 'Falta la Convocatoria del Curso.', 'warning');
         return false;
     }
 
     if (document.getElementById('txnGrupo').value < 1) {
-        $.messager.alert('INOFE', 'Falta el Grupo del Curso.', 'warning');
+        $.messager.alert('KDSA', 'Falta el Grupo del Curso.', 'warning');
         return false;
     }
 
-    if (document.getElementById('txnValor').value <= 0) {
-        $.messager.alert('INOFE', 'Falta el Valor del Curso.', 'warning');
-        return false;
-    }
-
-    if (document.getElementById('cboTipo').value != 0 && document.getElementById('cboTipo').value != 3) {
-        if (document.getElementById('txnMatricula').value <= 0) {
-            $.messager.alert('INOFE', 'Falta el Valor la Matrícula.', 'warning');
+    if (mnTipo < 5) //No valida al Webinar, Workshop y Teambuilding
+    { 
+        if (document.getElementById('txnValor').value <= 0) {
+            $.messager.alert('KDSA', 'Falta el Valor del Curso.', 'warning');
             return false;
         }
 
-        if (document.getElementById('txnCuota').value <= 0) {
-            $.messager.alert('INOFE', 'Falta el Valor de la Cuota.', 'warning');
+        if (document.getElementById('cboTipo').value != 0 && document.getElementById('cboTipo').value != 3) {
+            if (document.getElementById('txnMatricula').value <= 0) {
+                $.messager.alert('KDSA', 'Falta el Valor la Matrícula.', 'warning');
+                return false;
+            }
+
+            if (document.getElementById('txnCuota').value <= 0) {
+                $.messager.alert('KDSA', 'Falta el Valor de la Cuota.', 'warning');
+                return false;
+            }
+        }
+
+        if (document.getElementById('txnMora').value <= 0) {
+            $.messager.alert('KDSA', 'Falta el Porcentaje por Mora.', 'warning');
             return false;
         }
     }
-
-    if (document.getElementById('txnMora').value <= 0) {
-        $.messager.alert('INOFE', 'Falta el Porcentaje por Mora.', 'warning');
-        return false;
-    }
-
     if (document.getElementById('txnMaximo').value <= 0) {
-        $.messager.alert('INOFE', 'Falta la cantidad máxima de estudiantes.', 'warning');
+        $.messager.alert('KDSA', 'Falta la cantidad máxima de estudiantes.', 'warning');
         return false;
     }
 /*
     if ($('#dgMOD').datagrid('getRows').length <= 0) {
-        $.messager.alert('INOFE', 'Faltan los Módulos del Curso.', 'warning');
+        $.messager.alert('KDSA', 'Faltan los Módulos del Curso.', 'warning');
         return false;
     }
 */
     return true;
+}
+
+function llenaDocumentos()
+{
+    var datos = new FormData();
+    var preDocs = document.getElementById('cboPreDocs').value;
+    datos.append('codDocumento', preDocs);
+
+    $.ajax({
+        url: 'funciones/fxDatosCurso.php',
+        type: 'post',
+        data: datos,
+        contentType: false,
+        processData: false,
+        success: function(response)
+        {
+            datos = JSON.parse(response);
+            $('#dgDOC').datagrid({data: datos});
+            $('#dgDOC').datagrid('reload');
+        }
+    })
 }
 
 function cambiaValores()
@@ -1292,7 +1496,7 @@ function appendMOD() {
 
 		if ($('#txtModNumero').val() == "")
         {
-            $.messager.alert('INOFE', 'Falta el Número de Módulo.', 'warning');
+            $.messager.alert('KDSA', 'Falta el Número de Módulo.', 'warning');
         }
         else
         {
@@ -1308,7 +1512,7 @@ function appendMOD() {
 
                 if (existeModulo == 1)
                 {
-                    $.messager.alert('INOFE', 'El Número de Módulo junto con este Docente ya fueron registrados.', 'warning');
+                    $.messager.alert('KDSA', 'El Número de Módulo junto con este Docente ya fueron registrados.', 'warning');
                 }
                 else
                 {
@@ -1319,7 +1523,7 @@ function appendMOD() {
 
                     if (nombreModulo == "")
                     {
-                        $.messager.alert('INOFE', 'Falta el Nombre del Módulo.', 'warning');
+                        $.messager.alert('KDSA', 'Falta el Nombre del Módulo.', 'warning');
                     }
                     else
                     {
@@ -1350,7 +1554,7 @@ function appendMOD() {
                 
                 if (nombreModulo == "")
                 {
-                    $.messager.alert('INOFE', 'Falta el Nombre del Módulo.', 'warning');
+                    $.messager.alert('KDSA', 'Falta el Nombre del Módulo.', 'warning');
                 }
                 else
                 {
@@ -1361,7 +1565,7 @@ function appendMOD() {
 
                     if (fechaAnterior == 1)
                     {
-                        $.messager.alert('INOFE', 'La fecha inicial del Módulo es anterior al inicio del Curso.', 'warning');
+                        $.messager.alert('KDSA', 'La fecha inicial del Módulo es anterior al inicio del Curso.', 'warning');
                     }
                     else
                     {
@@ -1395,7 +1599,7 @@ function removeitMOD() {
     }
     else
     {
-        $.messager.alert('INOFE', 'El Módulo no puede ser borrado. Ya tiene la Planificación Programática.', 'warning');
+        $.messager.alert('KDSA', 'El Módulo no puede ser borrado. Ya tiene la Planificación Programática.', 'warning');
     }
     $('#dgMOD').datagrid('cancelEdit', indice)
     indice = undefined;
@@ -1459,13 +1663,13 @@ function appendFER() {
         if ($('#dtpFechaFer').val() < $('#dtpFechaIni').val() || $('#dtpFechaFer').val() > $('#dtpFechaFin').val() || $('#txtMotivoFer').val() == "")
         {
             if ($('#dtpFechaFer').val() < $('#dtpFechaIni').val())
-                $.messager.alert('INOFE', 'La fecha que desea ingresar está antes del inicio del Curso.', 'info');
+                $.messager.alert('KDSA', 'La fecha que desea ingresar está antes del inicio del Curso.', 'info');
 
             if ($('#dtpFechaFer').val() > $('#dtpFechaFin').val())
-                $.messager.alert('INOFE', 'La fecha que desea ingresar está después de la finalización del Curso.', 'info');
+                $.messager.alert('KDSA', 'La fecha que desea ingresar está después de la finalización del Curso.', 'info');
             
             if ($('#txtMotivoFer').val() == "")
-                $.messager.alert('INOFE', 'Falta el Motivo del Feriado.', 'info');
+                $.messager.alert('KDSA', 'Falta el Motivo del Feriado.', 'info');
         }
         else 
         {
@@ -1513,9 +1717,9 @@ function appendFER() {
             }
             else {
                 if (mbInsertarFecha == 0)
-                    $.messager.alert('INOFE', 'La fecha que desea ingresar no afecta el Curso.', 'info');
+                    $.messager.alert('KDSA', 'La fecha que desea ingresar no afecta el Curso.', 'info');
                 else
-                    $.messager.alert('INOFE', 'La fecha que desea ingresar ya está incluida.', 'info');
+                    $.messager.alert('KDSA', 'La fecha que desea ingresar ya está incluida.', 'info');
             }
         }
         editIndexFER = $('#dgFER').datagrid('getRows').length;
@@ -1671,9 +1875,9 @@ function preFeriados(){
 
             if (mbIngresaFecha == 0){
                 if (registros == 0)
-                    $.messager.alert('INOFE', 'No hay Feriados que afecten el Curso.', 'info');
+                    $.messager.alert('KDSA', 'No hay Feriados que afecten el Curso.', 'info');
                 else
-                    $.messager.alert('INOFE', 'Ya se ingresaron los Feriados que afectan el Curso.', 'info');
+                    $.messager.alert('KDSA', 'Ya se ingresaron los Feriados que afectan el Curso.', 'info');
             }
         }
     });
@@ -1690,6 +1894,7 @@ $('form').submit(function(e) {
         var sinModulos = true;
         var gridModulos = $('#dgMOD').datagrid('getData');
         var gridFeriados = $('#dgFER').datagrid('getData');
+        var gridDocumentos = $('#dgDOC').datagrid('getData');
 
         texto = '{"txtCodCurso":"' + document.getElementById("txtCodCurso").value + '", ';
         texto += '"cboCursoInatec":"' + document.getElementById("cboCursoInatec").value + '", ';
@@ -1800,7 +2005,21 @@ $('form').submit(function(e) {
                 else
                     texto += '"},';
             }
-        } 
+        }
+
+        registros = $('#dgDOC').datagrid('getRows').length - 1;
+
+        if (registros >= 0) {
+            texto += '"gridDocumentos": [';
+            for (i = 0; i <= registros; i++) {
+                texto += '{"documento":"' + gridDocumentos.rows[i].documento + '", "archivo":"' + gridDocumentos.rows[i].archivo + '", "ruta":"' + gridDocumentos.rows[i].ruta;
+
+                if (i == registros)
+                    texto += '"}]}';
+                else
+                    texto += '"},';
+            }
+        }
         else 
         {
             if (texto.slice(-1) == ',')
@@ -1834,85 +2053,3 @@ window.onload = function() {
     diaDeLaSemana();
 }
 </script>
-<?php
-function fxEscribeJsonModulo($Curso)
-{
-	if ($Curso == "")
-		$nombreArchivo = "CUR0000000A.json";
-	else
-		$nombreArchivo = $Curso . "A.json";
-
-	if (file_exists($nombreArchivo))
-		unlink($nombreArchivo);
-	
-	//Escribe el Json
-	$mDatos = fxDevuelveDetModulo($Curso);
-	$numRegistros = $mDatos->rowCount();
-
-	$archivo = fopen($nombreArchivo, "w");
-
-	fwrite($archivo, "[" . PHP_EOL);
-	
-	for ($i = 1; $i <= $numRegistros; $i++)
-	{
-		$Fila = $mDatos->fetch();
-		fwrite($archivo, "{");
-		fwrite($archivo, '"modulo":"' . rtrim($Fila['MODULO_REL']) . '", ');
-		fwrite($archivo, '"curso":"' . rtrim($Fila['CURSO_REL']) . '", ');
-        fwrite($archivo, '"codDocente":"' . rtrim($Fila['DOCENTE_REL']) . '", ');
-        fwrite($archivo, '"numero":"' . rtrim($Fila['NUMERO_021']) . '", ');
-		fwrite($archivo, '"docente":"' . rtrim($Fila['NOMBRE_100']) . '", ');
-		fwrite($archivo, '"nombre":"' . rtrim($Fila['NOMBRE_021']) . '", ');
-		fwrite($archivo, '"fechaIni":"' . rtrim($Fila['FECHAINI_021']) . '", ');
-        fwrite($archivo, '"fechaFin":"' . rtrim($Fila['FECHAFIN_021']) . '", ');
-        fwrite($archivo, '"valor":"' . rtrim($Fila['VALOR_021']) . '", ');
-        fwrite($archivo, '"plan":"' . rtrim($Fila['PLAN']) . '"');
-
-		if ($i == $numRegistros)
-			fwrite($archivo, "}" . PHP_EOL);
-		else
-			fwrite($archivo, "}," . PHP_EOL);
-	}
-	fwrite($archivo, "]");
-	fclose($archivo);
-	
-	return($nombreArchivo);
-}
-
-function fxEscribeJsonFeriado($Curso)
-{
-	if ($Curso == "")
-		$nombreArchivo = "CUR0000000B.json";
-	else
-		$nombreArchivo = $Curso . "B.json";
-
-	if (file_exists($nombreArchivo))
-		unlink($nombreArchivo);
-	
-    //Escribe el Json
-	$mDatos = fxDevuelveDetFeriado($Curso);
-	$numRegistros = $mDatos->rowCount();
-
-	$archivo = fopen($nombreArchivo, "w");
-	
-	fwrite($archivo, "[" . PHP_EOL);
-	
-	for ($i = 1; $i <= $numRegistros; $i++)
-	{
-		$Fila = $mDatos->fetch();
-		fwrite($archivo, "{");
-		fwrite($archivo, '"fecha":"' . trim($Fila['FECHA_022']) . '", ');
-		fwrite($archivo, '"dia":"' . trim($Fila['DIA_022']) . '", ');
-		fwrite($archivo, '"motivo":"' . trim($Fila['MOTIVO_022']) . '"');
-
-		if ($i == $numRegistros)
-			fwrite($archivo, "}" . PHP_EOL);
-		else
-			fwrite($archivo, "}," . PHP_EOL);
-	}
-	fwrite($archivo, "]");
-	fclose($archivo);
-
-	return($nombreArchivo);
-}
-?>
