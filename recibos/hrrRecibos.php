@@ -105,7 +105,7 @@
 <body>
     <form id="hrrRecibos" name="hrrRecibos" action="hrrRecibos.php" method="POST">
         <div width="50%" style="margin-left: 20%; margin-top: 2%">
-        <h1>INOFE</h1>
+        <h1>KDSA</h1>
             <table>
                 <tr>
                     <td class="ctrlAnchoFijo"><label for="txtCodPago">Código del Pago</label></td>
