@@ -69,16 +69,16 @@
 												<thead>
 													<tr>
 														<th data-column-id="MATRICULA_REL" data-identifier="true" data-align="left" data-header-align="left" data-width="10%">Matrícula</th>
-														<th data-column-id="ESTUDIANTE" data-order="asc" data-align="left" data-header-align="left" data-width="45%">Estudiante</th>
+														<th data-column-id="ESTUDIANTE" data-align="left" data-header-align="left" data-width="45%">Estudiante</th>
 														<th data-column-id="CURSO" data-align="left" data-header-align="left" data-width="45%">Curso</th>
 													</tr>
 												</thead>
 												<tbody>
 												<?php
 													$texto = "";
-													$msConsulta = "select distinct KDSA030A.MATRICULA_REL, concat(APELLIDOS_010, ', ', NOMBRES_010) as ESTUDIANTE, concat(NOMBRE_020, ' (', CONVOCATORIA_020, '/G', GRUPO_020, ')') as CURSO ";
+													$msConsulta = "select distinct KDSA030A.MATRICULA_REL, concat_ws(', ', trim(APELLIDOS_010), trim(NOMBRES_010)) as ESTUDIANTE, concat(NOMBRE_020, ' (', CONVOCATORIA_020, '/G', GRUPO_020, ')') as CURSO ";
 													$msConsulta .= "from KDSA030A, KDSA020A, KDSA010A, KDSA051A where KDSA030A.CURSO_REL = KDSA020A.CURSO_REL and KDSA030A.ESTUDIANTE_REL = KDSA010A.ESTUDIANTE_REL and ";
-													$msConsulta .= "KDSA030A.MATRICULA_REL = KDSA051A.MATRICULA_REL and ANULADO_051 = 0 and EXONERADO_051 = 0 and PAGADO_051 = 0 and ESTADO_030 <> 4";
+													$msConsulta .= "KDSA030A.MATRICULA_REL = KDSA051A.MATRICULA_REL and ANULADO_051 = 0 and EXONERADO_051 = 0 and PAGADO_051 = 0 and ESTADO_030 <> 4 order by ESTUDIANTE";
 													$mEstudiantes = $m_cnx_MySQL->prepare($msConsulta);
 													$mEstudiantes->execute();
 

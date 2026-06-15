@@ -75,6 +75,7 @@
                                     <li><a href="gridOtrosIngresos.php">Otros ingresos</a></li>
                                     <li><a href="gridCobrosEmpresa.php">Cobros empresariales</a></li>
                                     <li><a href="gridPagosEmpresa.php">Pagos empresariales</a></li>
+                                    <li><a href="procCierreCaja.php">Cierre de caja</a></li>
                                     <!--
                                     <li><a href="gridCobrosInatec.php">Cobros INATEC</a></li>
                                     <li><a href="gridPagosInatec.php">Pagos INATEC</a></li>

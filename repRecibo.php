@@ -9,6 +9,7 @@ if (!isset($_SESSION["gnVerifica"]) or $_SESSION["gnVerifica"] != 1)
 
 require_once ("funciones/fxGeneral.php");
 require_once ("funciones/fxUsuarios.php");
+require_once ("funciones/fxNumerosLetras.php");
 require_once ("tcpdf/tcpdf.php");
 $m_cnx_MySQL = fxAbrirConexion();
 $Registro = fxVerificaUsuario();
@@ -48,10 +49,16 @@ else
 		$pdf->setLanguageArray($l);
 	}
 
-	$pdf->setFontSize(10);
+	$pdf->setFontSize(11);
 	$pdf->AddPage();
 	
-	$msConsulta = "select FECHA_040, NOMBRE_040, TIPOCAMBIO_040, MONEDA_040, MONTO_040, TIPOPAGO_040, NUMEROCK_040, BANCOCK_040 from KDSA040A where PAGO_REL = ?";
+	$msConsulta = "select NOMBRE_002 from KDSA000A join KDSA002A on USUARIO_000 = USUARIO_REL where LLAVE1_000 = ? limit 1";
+	$mDatos = $m_cnx_MySQL->prepare($msConsulta);
+	$mDatos->execute([$msPago]);
+	$mFila = $mDatos->fetch();
+	$Usuario = $mFila["NOMBRE_002"];
+
+	$msConsulta = "select FECHA_040, RECIBO_040, NOMBRE_040, TIPOCAMBIO_040, MONEDA_040, MONTO_040, TIPOPAGO_040, NUMEROCK_040, BANCOCK_040 from KDSA040A where PAGO_REL = ?";
 	$mDatos = $m_cnx_MySQL->prepare($msConsulta);
 	$mDatos->execute([$msPago]);
 	$mFila = $mDatos->fetch();
@@ -62,21 +69,26 @@ else
 	$Dia = $FechaDividida[2];
 
 	$pdf->SetTextColor(0,0,0);
-	$pdf->SetFont('helvetica','',8);
+	$pdf->SetFont('helvetica','',10);
 
-	$mnLinea = 45;
+	$mnLinea = 53;
 	//FECHA
-	$pdf->Text(10, $mnLinea, $Dia);
-	$pdf->Text(22, $mnLinea, $Mes);
-	$pdf->Text(35, $mnLinea, substr($Anno, -2));
+	$pdf->Text(2, $mnLinea, $Dia);
+	$pdf->Text(12, $mnLinea, $Mes);
+	$pdf->Text(25, $mnLinea, substr($Anno, -2));
+
+	//NUMERO DEL RECIBO
+	$pdf->Text(160, $mnLinea, $mFila["RECIBO_040"]);
 
 	//NOMBRE DEL RECIBO
 	$mnLinea += 10;
-	$pdf->Text(44, $mnLinea, $mFila["NOMBRE_040"]);
+	$pdf->Text(35, $mnLinea, $mFila["NOMBRE_040"]);
 
 	//MONTO DEL RECIBO
 	$mnLinea += 10;
-	$pdf->Text(44, $mnLinea, $mFila["MONTO_040"]);
+	$msValorLetras = fxNumerosLetras(floatval($mFila["MONTO_040"]));
+	$msTexto = $mFila["MONTO_040"] . " (" . $msValorLetras . ")";
+	$pdf->Text(35, $mnLinea, $msTexto);
 
 	//CONCEPTO DEL RECIBO
 	$msConsulta = "select distinct TIPO_050 from KDSA041A, KDSA050A where KDSA041A.COBRO_REL = KDSA050A.COBRO_REL and PAGO_REL = ?";
@@ -90,7 +102,7 @@ else
 	{
 		switch (intval($mAuxFila["TIPO_050"])){
 			case 0:
-				$msTipo = "Cuota";
+				$msTipo = "Arancel";
 				break;
 			case 1:
 				$msTipo = "Moratorio";
@@ -108,7 +120,7 @@ else
 				$msTipo = "Certificado";
 				break;
 			case 6:
-				$msTipo = "Cuota especial";
+				$msTipo = "Arancel especial";
 				break;
 		}
 
@@ -124,8 +136,8 @@ else
 		$i++;
 	}
 	
-	$mnLinea += 10;
-	$pdf->Text(44, $mnLinea, trim($msConcepto));
+	$mnLinea += 8;
+	$pdf->Text(35, $mnLinea, trim($msConcepto));
 
 	//CURSO
 	$msConsulta = "select NOMBRE_020 from KDSA041A, KDSA050A, KDSA020A where KDSA041A.COBRO_REL = KDSA050A.COBRO_REL and KDSA050A.CURSO_REL = KDSA020A.CURSO_REL and PAGO_REL = ? limit 1";
@@ -134,43 +146,43 @@ else
 	$mAuxFila = $mAuxiliar->fetch();
 	
 	$mnLinea += 10;
-	$pdf->Text(44, $mnLinea, mb_convert_encoding(html_entity_decode($mAuxFila["NOMBRE_020"]), "UTF-8"));
+	$pdf->Text(35, $mnLinea, mb_convert_encoding(html_entity_decode($mAuxFila["NOMBRE_020"]), "UTF-8"));
 
 	//TIPO DE PAGO
 	switch (intval($mFila["TIPOPAGO_040"])){
 		case 0: //Efectivo
 			$mnLinea += 10;
-			$pdf->Text(24, $mnLinea, "X");
+			$pdf->Text(14, $mnLinea, "X");
 			break;
 		case 1: //Tarjeta
 			$mnLinea += 20;
-			$pdf->Text(21, $mnLinea, "X");
+			$pdf->Text(11, $mnLinea, "X");
 			break;
 		case 2: //Cheque
 			$mnLinea += 10;
-			$pdf->Text(74, $mnLinea, "X");
+			$pdf->Text(64, $mnLinea, "X");
 			$pdf->Text(105, $mnLinea, $mFila["NUMEROCK_040"]);
 			$pdf->Text(165, $mnLinea, $mFila["BANCOCK_040"]);
 			break;
 		case 3: //Depósito FICOHSA
-			$mnLinea += 10;
-			$pdf->Text(105, $mnLinea, $mFila["NUMEROCK_040"]);
 			$mnLinea += 28;
-			$pdf->Text(25, $mnLinea, "X");
+			$pdf->Text(15, $mnLinea, "X");
+			$pdf->Text(90, $mnLinea, $mFila["NUMEROCK_040"]);
 			break;
 		case 4: //Depósito BAC
-			$mnLinea += 10;
-			$pdf->Text(105, $mnLinea, $mFila["NUMEROCK_040"]);
 			$mnLinea += 28;
-			$pdf->Text(25, $mnLinea, "X");
+			$pdf->Text(15, $mnLinea, "X");
+			$pdf->Text(90, $mnLinea, $mFila["NUMEROCK_040"]);
 			break;
 		case 5: //eCommerce
-			$mnLinea += 10;
-			$pdf->Text(105, $mnLinea, $mFila["NUMEROCK_040"]);
 			$mnLinea += 20;
-			$pdf->Text(30, $mnLinea, "X");
+			$pdf->Text(20, $mnLinea, "X");
+			$pdf->Text(90, $mnLinea, $mFila["NUMEROCK_040"]);
 			break;
 	}
+
+	$mnLinea += 20;
+	$pdf->Text(85, $mnLinea, $Usuario);
 
 	$pdf->Output();
 }

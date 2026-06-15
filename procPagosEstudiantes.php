@@ -77,8 +77,8 @@
 						fxGuardarDetPagos ($Codigo, $Cobro, $Matricula, $Monto, $Descuento);
 					}
 				}
-					
 				echo('<meta http-equiv="Refresh" content="0;url=gridPagos.php"/>');
+
 			}
 			else
 			{
@@ -192,13 +192,6 @@
 						</div>
 						
 						<div class = "form-group row">
-							<label for="txtRecibo" class="col-sm-12 col-md-2 col-form-label">Recibo</label>
-							<div class="col-sm-12 col-md-3">
-							<?php echo('<input type="text" class="form-control" id="txtRecibo" name="txtRecibo" value="' . $Recibo . '" />'); ?>
-							</div>
-						</div>
-						
-						<div class = "form-group row">
 							<label for="optSerie" class="col-sm-12 col-md-2 form-label">Serie</label>
 							<div class="col-sm-12 col-md-4">
 								<div class = "radio">
@@ -209,6 +202,13 @@
 										echo('<input type="radio" id="optSerie1" name="optSerie" value="A" /> A <input type="radio" id="optSerie2" name="optSerie" value="B" checked /> B');
 								?>
 								</div>
+							</div>
+						</div>
+
+						<div class = "form-group row">
+							<label for="txtRecibo" class="col-sm-12 col-md-2 col-form-label">Recibo</label>
+							<div class="col-sm-12 col-md-3">
+							<?php echo('<input type="text" class="form-control" id="txtRecibo" name="txtRecibo" value="' . $Recibo . '" disabled />'); ?>
 							</div>
 						</div>
 						
@@ -229,7 +229,7 @@
 							<div class="col-sm-12 col-md-4">
 								<div class = "radio">
 								<?php
-									if ($Moneda == 1 or $Codigo == "")
+									if ($Moneda == 1)
 										echo('<input type="radio" id="optMoneda1" name="optMoneda" value="0" /> Córdobas <input type="radio" id="optMoneda2" name="optMoneda" value="1" checked /> Dólares');
 									else
 										echo('<input type="radio" id="optMoneda1" name="optMoneda" value="0" checked /> Córdobas <input type="radio" id="optMoneda2" name="optMoneda" value="1" /> Dólares');
@@ -297,11 +297,11 @@
 						</div>
 						
 						<div class = "form-group row">
-							<label for="txtNumeroCk" class="col-sm-12 col-md-2 col-form-label">Cheque, Depósito o eCommerce</label>
+							<label for="txtNumeroCk" class="col-sm-12 col-md-2 col-form-label">Referencia</label>
 							<div class="col-sm-12 col-md-3">
-								<?php echo('<input type="text" class="form-control" id="txtNumeroCk" name="txtNumeroCk" value="' . $NumeroCk . '" />'); ?>
+								<?php echo('<input type="text" class="form-control" id="txtNumeroCk" name="txtNumeroCk" placeholder="Cheque, depósito, POS, eComerce" value="' . $NumeroCk . '" />'); ?>
 							</div>
-							<label for="txtBancoCk" class="col-sm-12 col-md-2 col-form-label">Banco del Cheque</label>
+							<label for="txtBancoCk" class="col-sm-12 col-md-2 col-form-label">Banco receptor</label>
 							<div class="col-sm-12 col-md-3">
 								<?php echo('<input type="text" class="form-control" id="txtBancoCk" name="txtBancoCk" value="' . $BancoCk . '" />'); ?>
 							</div>
@@ -450,13 +450,13 @@
 			$.messager.alert('KDSA','No puede ingresar el pago. Ya se hizo el cierre de caja de ' + $('#dtpFecha').val(),'warning');
 			return false;
 		}
-
+/*
 		if(document.getElementById('txtRecibo').value=="")
 		{
 			$.messager.alert('INOFE','Falta el Número de Recibo.','warning');
 			return false;
 		}
-		
+*/		
 		if(document.getElementById('txnTipoCambio').value==0)
 		{
 			$.messager.alert('INOFE','Falta el Tipo de Cambio.','warning');
@@ -469,6 +469,18 @@
 			return false;
 		}
 		
+		if(document.getElementById('optTipoPago2').checked && document.getElementById('txtNumeroCk').value=="")
+		{
+			$.messager.alert('INOFE','Falta el Número de referencia del POS.','warning');
+			return false;
+		}
+
+		if(document.getElementById('optTipoPago2').checked && document.getElementById('txtBancoCk').value=="")
+		{
+			$.messager.alert('INOFE','Falta el banco del POS.','warning');
+			return false;
+		}
+
 		if(document.getElementById('optTipoPago3').checked && document.getElementById('txtNumeroCk').value=="")
 		{
 			$.messager.alert('INOFE','Falta el Número del Cheque.','warning');
@@ -483,13 +495,25 @@
 
 		if(document.getElementById('optTipoPago4').checked && document.getElementById('txtNumeroCk').value=="")
 		{
-			$.messager.alert('INOFE','Falta el Número del depósito FICHOSA.','warning');
+			$.messager.alert('INOFE','Falta el Número del depósito.','warning');
+			return false;
+		}
+
+		if(document.getElementById('optTipoPago4').checked && document.getElementById('txtBancoCk').value=="")
+		{
+			$.messager.alert('INOFE','Falta el banco del depósito.','warning');
 			return false;
 		}
 
 		if(document.getElementById('optTipoPago5').checked && document.getElementById('txtNumeroCk').value=="")
 		{
-			$.messager.alert('INOFE','Falta el Número del depósito BAC.','warning');
+			$.messager.alert('INOFE','Falta el Número del depósito.','warning');
+			return false;
+		}
+
+		if(document.getElementById('optTipoPago5').checked && document.getElementById('txtBancoCk').value=="")
+		{
+			$.messager.alert('INOFE','Falta el banco del depósito.','warning');
 			return false;
 		}
 
@@ -726,7 +750,7 @@
 			data:datos,
 			beforeSend: function(){console.log(datos)}
 		})
-		.done(function(){location.href="gridPagos.php?KDSA=1"+estudiante;})
+		.done(function(){location.href="gridPagos.php";})
 		.fail(function(){console.log('Error')});
 		}
 	});
