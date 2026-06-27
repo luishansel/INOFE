@@ -28,7 +28,8 @@ else
 {
 	$msPago = $_POST["KDSA"];
 
-	$pdf = new TCPDF('P', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
+	//$pdf = new TCPDF('P', PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false); LHVG20260618
+	$pdf = new TCPDF('P', 'mm', array(216,140), true, 'UTF-8', false); //Recomendación de la IA
 
 	// remove default header/footer
 	$pdf->setPrintHeader(false);
@@ -38,10 +39,12 @@ else
 	$pdf->SetDefaultMonospacedFont(PDF_FONT_MONOSPACED);
 
 	// set margins
-	$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
+	//$pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT); LHVG20260618
+	$pdf->SetMargins(0,0,0); //Recomendación de la IA
 
 	// set auto page breaks
-	$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
+	//$pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM); LHVG20260618
+	$pdf->SetAutoPageBreak(false); //Recomendación de la IA
 
 	// set some language-dependent strings (optional)
 	if (@file_exists(dirname(__FILE__).'/lang/spa.php')) {
@@ -49,14 +52,18 @@ else
 		$pdf->setLanguageArray($l);
 	}
 
+	//Recomendación de la IA
+	$pdf->SetCellPadding(0);
+	$pdf->setImageScale(PDF_IMAGE_SCALE_RATIO);
+
 	$pdf->setFontSize(11);
 	$pdf->AddPage();
 	
-	$msConsulta = "select NOMBRE_002 from KDSA000A join KDSA002A on USUARIO_000 = USUARIO_REL where LLAVE1_000 = ? limit 1";
+	$msConsulta = "select USUARIO_000 from KDSA000A where LLAVE1_000 = ? limit 1";
 	$mDatos = $m_cnx_MySQL->prepare($msConsulta);
 	$mDatos->execute([$msPago]);
 	$mFila = $mDatos->fetch();
-	$Usuario = $mFila["NOMBRE_002"];
+	$Usuario = $mFila["USUARIO_000"];
 
 	$msConsulta = "select FECHA_040, RECIBO_040, NOMBRE_040, TIPOCAMBIO_040, MONEDA_040, MONTO_040, TIPOPAGO_040, NUMEROCK_040, BANCOCK_040 from KDSA040A where PAGO_REL = ?";
 	$mDatos = $m_cnx_MySQL->prepare($msConsulta);
@@ -71,18 +78,18 @@ else
 	$pdf->SetTextColor(0,0,0);
 	$pdf->SetFont('helvetica','',10);
 
-	$mnLinea = 53;
+	$mnLinea = 52;
 	//FECHA
 	$pdf->Text(2, $mnLinea, $Dia);
 	$pdf->Text(12, $mnLinea, $Mes);
 	$pdf->Text(25, $mnLinea, substr($Anno, -2));
 
 	//NUMERO DEL RECIBO
-	$pdf->Text(160, $mnLinea, $mFila["RECIBO_040"]);
+	$pdf->Text(130, $mnLinea, $mFila["RECIBO_040"]);
 
 	//NOMBRE DEL RECIBO
-	$mnLinea += 10;
-	$pdf->Text(35, $mnLinea, $mFila["NOMBRE_040"]);
+	$mnLinea += 8;
+	$pdf->Text(35, $mnLinea, html_entity_decode($mFila["NOMBRE_040"]));
 
 	//MONTO DEL RECIBO
 	$mnLinea += 10;
@@ -140,7 +147,16 @@ else
 	$pdf->Text(35, $mnLinea, trim($msConcepto));
 
 	//CURSO
-	$msConsulta = "select NOMBRE_020 from KDSA041A, KDSA050A, KDSA020A where KDSA041A.COBRO_REL = KDSA050A.COBRO_REL and KDSA050A.CURSO_REL = KDSA020A.CURSO_REL and PAGO_REL = ? limit 1";
+	$msConsulta = "select EMPRESARIAL_040 from KDSA040A where PAGO_REL = ?";
+	$mAuxiliar = $m_cnx_MySQL->prepare($msConsulta);
+	$mAuxiliar->execute([$msPago]);
+	$mAuxFila = $mAuxiliar->fetch();
+	$mbEmpresarial = $mAuxFila["EMPRESARIAL_040"];
+
+	if ($mbEmpresarial == 0)
+		$msConsulta = "select NOMBRE_020 from KDSA041A, KDSA050A, KDSA020A where KDSA041A.COBRO_REL = KDSA050A.COBRO_REL and KDSA050A.CURSO_REL = KDSA020A.CURSO_REL and PAGO_REL = ? limit 1";
+	else
+		$msConsulta = "select NOMBRE_020 from KDSA042A, KDSA050A, KDSA020A where KDSA042A.COBRO_REL = KDSA050A.COBRO_REL and KDSA050A.CURSO_REL = KDSA020A.CURSO_REL and PAGO_REL = ? limit 1";
 	$mAuxiliar = $m_cnx_MySQL->prepare($msConsulta);
 	$mAuxiliar->execute([$msPago]);
 	$mAuxFila = $mAuxiliar->fetch();
@@ -156,34 +172,36 @@ else
 			break;
 		case 1: //Tarjeta
 			$mnLinea += 20;
-			$pdf->Text(11, $mnLinea, "X");
+			$pdf->Text(15, $mnLinea, "X");
+			$pdf->Text(20, $mnLinea, $mFila["NUMEROCK_040"]);
+			$pdf->Text(50, $mnLinea, $mFila["BANCOCK_040"]);
 			break;
 		case 2: //Cheque
 			$mnLinea += 10;
 			$pdf->Text(64, $mnLinea, "X");
-			$pdf->Text(105, $mnLinea, $mFila["NUMEROCK_040"]);
-			$pdf->Text(165, $mnLinea, $mFila["BANCOCK_040"]);
+			$pdf->Text(85, $mnLinea, $mFila["NUMEROCK_040"]);
+			$pdf->Text(110, $mnLinea, $mFila["BANCOCK_040"]);
 			break;
 		case 3: //Depósito FICOHSA
-			$mnLinea += 28;
+			$mnLinea += 40;
 			$pdf->Text(15, $mnLinea, "X");
-			$pdf->Text(90, $mnLinea, $mFila["NUMEROCK_040"]);
+			$pdf->Text(25, $mnLinea, $mFila["NUMEROCK_040"]);
 			break;
 		case 4: //Depósito BAC
-			$mnLinea += 28;
+			$mnLinea += 35;
 			$pdf->Text(15, $mnLinea, "X");
-			$pdf->Text(90, $mnLinea, $mFila["NUMEROCK_040"]);
+			$pdf->Text(25, $mnLinea, $mFila["NUMEROCK_040"]);
 			break;
 		case 5: //eCommerce
-			$mnLinea += 20;
+			$mnLinea += 28;
 			$pdf->Text(20, $mnLinea, "X");
-			$pdf->Text(90, $mnLinea, $mFila["NUMEROCK_040"]);
+			$pdf->Text(30, $mnLinea, $mFila["NUMEROCK_040"]);
 			break;
 	}
 
-	$mnLinea += 20;
-	$pdf->Text(85, $mnLinea, $Usuario);
+	$mnLinea += 16;
+	$pdf->Text(90, 122, $Usuario);
 
-	$pdf->Output();
+	$pdf->Output('recibo.pdf', 'I');
 }
 ?>
