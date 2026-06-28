@@ -141,7 +141,6 @@
 <script src="bootstrap/dist/jquery.bootgrid.js"></script>
 <script src="bootstrap/dist/jquery.bootgrid.fa.js"></script>
 <script src="js/jquery.redirect.js"></script>
-<script src="js/prmenu.min.js"></script>
 <script>
     $(window).scroll(function() {
         var scroll = $(window).scrollTop();

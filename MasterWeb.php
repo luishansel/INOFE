@@ -16,7 +16,6 @@ set_time_limit (0);
 <link rel="icon" href="imagenes/favicon.png" />
 <link rel="stylesheet" type="text/css" href="css/bootstrap441.css" />
 <link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
-<link rel="stylesheet" type="text/css" href="css/prmenu.css" />
 <link rel="stylesheet" type="text/css" href="bootstrap/css/jquery.bootgrid.css" />
 <link rel="stylesheet" type="text/css" href="css/easyui.css" />
 <link rel="stylesheet" type="text/css" href="css/icon.css" />
@@ -24,7 +23,6 @@ set_time_limit (0);
 
 <script src="js/jquery.min.js"></script>
 <script src="js/jquery-1.9.1.min.js"></script>
-<script src="js/prmenu.min.js"></script>
 <script src="js/jquery.easyui.min.js"></script>
 <script src="js/datagrid-detailview.js"></script>
 <script src="js/jquery.redirect.js"></script>
@@ -32,17 +30,61 @@ set_time_limit (0);
 <script src="bootstrap/js/bootstrap.js"></script>
 <script src="bootstrap/js/moderniz.2.8.1.js"></script>
 
+
 <script>
-    $(document).ready(function(){
-        $('#top-menu').prmenu(
-            {
-                "case": "capitalize",
-                "linkbgcolor": "#cf5516",
-                "linktextcolor": "#ffffff",
-            }
-        );
-    });
+    // jquery ready start
+    $(document).ready(function() {
+        //////////////////////// Prevent closing from click inside dropdown
+        $(document).on('click', '.dropdown-menu', function (e) {
+        e.stopPropagation();
+        });
+
+        // make it as accordion for smaller screens
+        if ($(window).width() < 992) {
+            $('.dropdown-menu a').click(function(e){
+                e.preventDefault();
+                if($(this).next('.submenu').length){
+                    $(this).next('.submenu').toggle();
+                }
+                $('.dropdown').on('hide.bs.dropdown', function () {
+                $(this).find('.submenu').hide();
+                })
+            });
+        }
+    }); // jquery end
 </script>
+
+<style type="text/css">
+	@media (min-width: 992px){
+		.dropdown-menu .dropdown-toggle:after{
+			border-top: .3em solid transparent;
+		    border-right: 0;
+		    border-bottom: .3em solid transparent;
+		    border-left: .3em solid;
+		}
+
+		.dropdown-menu .dropdown-menu{
+			margin-left:0; margin-right: 0;
+		}
+
+		.dropdown-menu li{
+			position: relative;
+		}
+		.nav-item .submenu{ 
+			display: none;
+			position: absolute;
+			left:100%; top:-7px;
+		}
+		.nav-item .submenu-left{ 
+			right:100%; left:auto;
+		}
+
+		.dropdown-menu > li:hover{ background-color: #f1f1f1 }
+		.dropdown-menu > li:hover > .submenu{
+			display: block;
+		}
+	}
+</style>
 
 <title>Aplicación web INOFE</title>
 </head>
@@ -56,120 +98,142 @@ set_time_limit (0);
     
         <div class="row">
             <div class="col-md-9">
-                <ul id="top-menu" style="z-index: 1;">
-                    <li><a href="frmInicio.php" class="active">Inicio</a></li>
-                    <li><a href="#">Catálogos</a>
-                        <ul>
-                            <li><a href="#">Académico »</a>
-                                <ul>
-                                    <li><a href="gridEstudiantes.php">Estudiantes</a></li>
-                                    <li><a href="gridCursos.php">Cursos</a></li>
-                                    <!--
-                                    <li><a href="gridCursosInatec.php">Cursos INATEC</a></li>
-                                    -->
-                                    <li><a href="gridDocentes.php">Docentes</a></li>
+                <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#main_nav">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="main_nav">
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a href="frmInicio.php" class="nav-link">Inicio</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">Catálogos</a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item dropdown-toggle" href="#">Académico</a>
+                                        <ul class="submenu dropdown-menu">
+                                            <li><a class="dropdown-item" href="gridEstudiantes.php">Estudiantes</a></li>
+                                            <li><a class="dropdown-item" href="gridCursos.php">Cursos</a></li>
+                                            <!--
+                                            <li><a href="gridCursosInatec.php">Cursos INATEC</a></li>
+                                            -->
+                                            <li><a class="dropdown-item" href="gridDocentes.php">Docentes</a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a class="dropdown-item" href="gridCobros.php">Cobros</a></li>
+                                    <li><a class="dropdown-item" href="gridProspectos.php">Prospectos</a></li>
                                 </ul>
                             </li>
-                            <li><a href="gridCobros.php">Cobros</a></li>
-                            <li><a href="gridProspectos.php">Prospectos</a></li>
-                        </ul>
-                    </li>
 
-                    <li><a href="#">Procesos</a>
-                        <ul>
-                            <li><a href="#">Financiero »</a>
-                                <ul>
-                                    <li><a href="procCobrosIndividuales.php">Cobros individuales</a></li>
-                                    <li><a href="gridPagos.php">Pagos de los estudiantes</a></li>
-                                    <li><a href="gridOtrosIngresos.php">Otros ingresos</a></li>
-                                    <li><a href="gridCobrosEmpresa.php">Cobros empresariales</a></li>
-                                    <li><a href="gridPagosEmpresa.php">Pagos empresariales</a></li>
-                                    <li><a href="procCierreCaja.php">Cierre de caja</a></li>
-                                    <!--
-                                    <li><a href="gridCobrosInatec.php">Cobros INATEC</a></li>
-                                    <li><a href="gridPagosInatec.php">Pagos INATEC</a></li>
-                                    -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">Procesos</a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item dropdown-toggle" href="#">Financiero</a>
+                                        <ul class="submenu dropdown-menu">
+                                            <li><a class="dropdown-item" href="procCobrosIndividuales.php">Cobros individuales</a></li>
+                                            <li><a class="dropdown-item" href="gridPagos.php">Pagos de los estudiantes</a></li>
+                                            <li><a class="dropdown-item" href="gridOtrosIngresos.php">Otros ingresos</a></li>
+                                            <li><a class="dropdown-item" href="gridCobrosEmpresa.php">Cobros empresariales</a></li>
+                                            <li><a class="dropdown-item" href="gridPagosEmpresa.php">Pagos empresariales</a></li>
+                                            <li><a class="dropdown-item" href="procCierreCaja.php">Cierre de caja</a></li>
+                                            <!--
+                                            <li><a href="gridCobrosInatec.php">Cobros INATEC</a></li>
+                                            <li><a href="gridPagosInatec.php">Pagos INATEC</a></li>
+                                            -->
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item dropdown-toggle" href="#">Docencia</a>
+                                        <ul class="submenu dropdown-menu">
+                                            <li><a class="dropdown-item" href="gridPlanClase.php">Planificación de clases</a></li>
+                                            <li><a class="dropdown-item" href="gridAsistencia.php">Asistencias</a></li>
+                                            <li><a class="dropdown-item" href="gridCalificaciones.php">Calificaciones</a></li>
+                                            <li><a class="dropdown-item" href="gridIncidencias.php">Incidencias</a></li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item dropdown-toggle" href="#">Certificación</a>
+                                        <ul class="submenu dropdown-menu">
+                                            <li><a class="dropdown-item" href="gridTomos.php">Administración de tomos</a></li>
+                                            <li><a class="dropdown-item" href="frmCertificacion.php">Control de certificaciones</a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a class="dropdown-item" href="gridMatricula.php">Matrícula</a></li>
+                                    <li><a class="dropdown-item" href="gridEstadoMatricula.php">Estado de las matrículas</a></li>
+                                    <li><a class="dropdown-item" href="gridProformas.php">Proformas</a></li>
+                                    <li><a class="dropdown-item" href="gridSeguimiento.php">Seguimiento de prospectos</a></li>
+                                    <li><a class="dropdown-item" href="frmRegulacionAsistencia.php">Regulación de asistencias</a></li>
+                                    <li><a class="dropdown-item" href="frmCertificacion.php">Certificación</a></li>
                                 </ul>
                             </li>
-                            <li><a href="#">Docencia »</a>
-                                <ul>
-                                    <li><a href="gridPlanClase.php">Planificación de clases</a></li>
-                                    <li><a href="gridAsistencia.php">Asistencias</a></li>
-                                    <li><a href="gridCalificaciones.php">Calificaciones</a></li>
-                                    <li><a href="gridIncidencias.php">Incidencias</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="#">Certificación »</a>
-                                <ul>
-                                    <li><a href="gridTomos.php">Administración de tomos</a></li>
-                                    <li><a href="frmCertificacion.php">Control de certificaciones</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="gridMatricula.php">Matrícula</a></li>
-                            <li><a href="gridEstadoMatricula.php">Estado de las matrículas</a></li>
-                            <li><a href="gridProformas.php">Proformas</a></li>
-                            <li><a href="gridSeguimiento.php">Seguimiento de prospectos</a></li>
-                            <li><a href="frmRegulacionAsistencia.php">Regulación de asistencias</a></li>
-			                <li><a href="frmCertificacion.php">Certificación</a></li>
-                        </ul>
-                    </li>
 
-                    <li><a href="#">Reportes y Consultas</a>
-                        <ul>
-                            <li><a href="#">Académico »</a>
-                                <ul>
-                                    <li><a href="frmHojaMatricula.php">Hoja de matrícula</a></li>
-                                    <li><a href="frmMatriculados.php">Estudiantes matriculados</a></li>
-                                    <li><a href="frmMatPeriodo.php">Matriculados por período</a></li>
-                                    <li><a href="frmAsistencia.php">Asistencia estudiantil</a></li>
-                                    <li><a href="frmCalificaciones.php">Calificaciones</a></li>
-                                    <li><a href="frmPlanesClases.php">Planes de Clases</a></li>
-                                    <li><a href="consCursos.php">Cursos activos</a></li>
-                                    <li><a href="frmAsistenciaSemanal.php">Asistencia por período</a></li>
-                                    <li><a href="frmMatGeneral.php">Matrícula general</a></li>
-                                    <li><a href="frmAlumnoActivo.php">Constancia de alumno activo</a></li>
-                                    <li><a href="frmEstadoMatricula.php">Estado de las matrículas</a></li>
-                                    <li><a href="frmDeserciones.php">Deserciones</a></li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">Reportes y Consultas</a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item dropdown-toggle" href="#">Académico</a>
+                                        <ul class="submenu dropdown-menu">
+                                            <li><a class="dropdown-item" href="frmHojaMatricula.php">Hoja de matrícula</a></li>
+                                            <li><a class="dropdown-item" href="frmMatriculados.php">Estudiantes matriculados</a></li>
+                                            <li><a class="dropdown-item" href="frmMatPeriodo.php">Matriculados por período</a></li>
+                                            <li><a class="dropdown-item" href="frmAsistencia.php">Asistencia estudiantil</a></li>
+                                            <li><a class="dropdown-item" href="frmCalificaciones.php">Calificaciones</a></li>
+                                            <li><a class="dropdown-item" href="frmPlanesClases.php">Planes de Clases</a></li>
+                                            <li><a class="dropdown-item" href="consCursos.php">Cursos activos</a></li>
+                                            <li><a class="dropdown-item" href="frmAsistenciaSemanal.php">Asistencia por período</a></li>
+                                            <li><a class="dropdown-item" href="frmMatGeneral.php">Matrícula general</a></li>
+                                            <li><a class="dropdown-item" href="frmAlumnoActivo.php">Constancia de alumno activo</a></li>
+                                            <li><a class="dropdown-item" href="frmEstadoMatricula.php">Estado de las matrículas</a></li>
+                                            <li><a class="dropdown-item" href="frmDeserciones.php">Deserciones</a></li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item dropdown-toggle" href="#">Financiero</a>
+                                        <ul class="submenu dropdown-menu">
+                                            <li><a class="dropdown-item" href="frmEstadoCuentas.php">Estado de cuentas del estudiante</a></li>
+                                            <li><a class="dropdown-item" href="frmIngresos.php">Ingresos</a></li>
+                                            <li><a class="dropdown-item" href="frmProyecciones.php">Proyecciones</a></li>
+                                            <li><a class="dropdown-item" href="frmCtasPorCobrar.php">Cuentas por cobrar</a></li>
+                                            <li><a class="dropdown-item" href="frmSolventes.php">Estudiantes solventes</a></li>
+                                            <li><a class="dropdown-item" href="frmProximosPagos.php">Próximos Pagos de Estudiantes</a></li>
+                                            <li><a class="dropdown-item" href="frmAsistenciaPeriodo.php">Asistencias de los Docentes</a></li>
+                                            <li><a class="dropdown-item" href="frmPagosDocentes.php">Soporte de Pagos a Docentes</a></li>
+                                            <li><a class="dropdown-item" href="frmCobrosCurso.php">Cobros de los cursos</a></li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item dropdown-toggle" href="#">Certificación</a>
+                                        <ul class="submenu dropdown-menu">
+                                            <li><a class="dropdown-item" href="frmLibroActas.php">Libro de actas</a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a class="dropdown-item" href="frmBitacora.php">Bitácora</a></li>
                                 </ul>
                             </li>
-                            <li><a href="#">Financiero »</a>
-                                <ul>
-                                    <li><a href="frmEstadoCuentas.php">Estado de cuentas del estudiante</a></li>
-                                    <li><a href="frmIngresos.php">Ingresos</a></li>
-                                    <li><a href="frmProyecciones.php">Proyecciones</a></li>
-                                    <li><a href="frmCtasPorCobrar.php">Cuentas por cobrar</a></li>
-                                    <li><a href="frmSolventes.php">Estudiantes solventes</a></li>
-                                    <li><a href="frmProximosPagos.php">Próximos Pagos de Estudiantes</a></li>
-                                    <li><a href="frmAsistenciaPeriodo.php">Asistencias de los Docentes</a></li>
-                                    <li><a href="frmPagosDocentes.php">Soporte de Pagos a Docentes</a></li>
-                                    <li><a href="frmCobrosCurso.php">Cobros de los cursos</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="#">Certificación »</a>
-                                <ul>
-                                    <li><a href="frmLibroActas.php">Libro de actas</a></li>
-                                </ul>
-                            </li>
-                            <li><a href="frmBitacora.php">Bitácora</a></li>
-                        </ul>
-                    </li>
 
-                    <li><a href="#">Herramientas</a>
-                        <ul>
-                            <li><a href="gridUsuarios.php">Usuarios</a></li>
-                            <li><a href="gridGrupos.php">Grupos</a></li>
-                            <li><a href="gridCfgModulo.php">Módulos de los Cursos</a></li>
-                            <li><a href="gridFeriados.php">Días no hábiles</a></li>
-                            <li><a href="hrrMatriculaEnLinea.php">Enlace para Matrícula en Linea</a></li>
-                            <!--li><a href="hrrCobroIndividual.php">Ajuste de Cobros individuales</a></li-->
-                            <li><a href="gridFirmas.php">Firmas para constancia de alumno</a></li>
-                            <li><a href="hrrCobros.php">Envío masivo de cobros</a></li>
-                            <li><a href="gridDocCurso.php">Documentos obligatorios de los cursos</a></li>
-                        </ul>
-                    </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">Herramientas</a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="gridUsuarios.php">Usuarios</a></li>
+                                    <li><a class="dropdown-item" href="gridGrupos.php">Grupos</a></li>
+                                    <li><a class="dropdown-item" href="gridCfgModulo.php">Módulos de los Cursos</a></li>
+                                    <li><a class="dropdown-item" href="gridFeriados.php">Días no hábiles</a></li>
+                                    <li><a class="dropdown-item" href="hrrMatriculaEnLinea.php">Enlace para Matrícula en Linea</a></li>
+                                    <!--li><a href="hrrCobroIndividual.php">Ajuste de Cobros individuales</a></li-->
+                                    <li><a class="dropdown-item" href="gridFirmas.php">Firmas para constancia de alumno</a></li>
+                                    <li><a class="dropdown-item" href="hrrCobros.php">Envío masivo de cobros</a></li>
+                                    <li><a class="dropdown-item" href="gridDocCurso.php">Documentos obligatorios de los cursos</a></li>
+                                </ul>
+                            </li>
 
-                    <li><a href="index.php">Cerrar sesión</a></li>
-                </ul>
+                            <li class="nav-item">
+                                <a class="nav-link" href="index.php">Cerrar sesión</a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
             </div>
             <div class="col-md-3 text-right">
                 <div style="display:inline-block; vertical-align:middle; margin-left:1%; margin-top:4%">

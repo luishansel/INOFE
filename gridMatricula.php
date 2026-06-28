@@ -124,7 +124,6 @@
 <script src="bootstrap/js/moderniz.2.8.1.js"></script>
 <script src="bootstrap/dist/jquery.bootgrid.js"></script>
 <script src="bootstrap/dist/jquery.bootgrid.fa.js"></script>
-<script src="js/prmenu.min.js"></script>
 <script src="js/jquery.redirect.js"></script>
 <script>
 	$(function() {
