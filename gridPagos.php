@@ -43,7 +43,16 @@
 				$msPago = $_POST["KDSA"];
 				fxAnularPagos($msPago);
 				fxAgregarBitacora($_SESSION["gsUsuario"], "KDSA040A", $msPago, "", "Anular");
-            }
+			}
+			
+			if (isset($_POST["mnOpcion"]) and isset($_POST["mnAnno"])){
+				$mnOpcion = $_POST["mnOpcion"];
+				$mnAnno = $_POST["mnAnno"];
+			}
+			else{
+				$mnOpcion = 0;
+				$mnAnno = 0;
+			}
 		?>
     	<div class="container">
         	<div id="DivContenido">
@@ -109,8 +118,48 @@
 												echo('<button id="view" type="button" class="btn btn-warning">Ver</button>');
 												echo('<button id="print" type="button" class="btn btn-warning">Imprimir recibo</button>');
 											?>
+
+											<div style="float:right; margin-right:1%; display:inline-block">
+												<?php
+													if ($mnOpcion == 0)
+														echo('<input type="radio" name="optFiltro" id="optFiltro1" onchange="fxCambiaOpcion()" checked>Filtrar por año &nbsp;');
+													else
+														echo('<input type="radio" name="optFiltro" id="optFiltro1" onchange="fxCambiaOpcion()">Filtrar por año &nbsp;');
+
+													$msConsulta = "select distinct year(FECHA_040) as ANNO from KDSA040A order by year(FECHA_040) desc";
+													$mDatos = $m_cnx_MySQL->prepare($msConsulta);
+													$mDatos->execute();
+
+													echo('<select style="background-color: white" id="cboAnno" name="cboAnno" onchange="fxCambiaOpcion()">');
+													while ($mFila = $mDatos->fetch())
+													{
+														$Valor = trim($mFila["ANNO"]);
+														$Texto = trim($mFila["ANNO"]);
+														
+														if ($mnAnno == 0)
+														{
+															$mnAnno = $Valor;
+															echo("<option value='" . $Valor . "' selected>" . $Texto . "</option>");
+														}
+														else{
+															if ($Valor == $mnAnno)
+																echo("<option value='" . $Valor . "' selected>" . $Texto . "</option>");
+															else
+																echo("<option value='" . $Valor . "'>" . $Texto . "</option>");
+														}
+														
+													}
+													echo('</select> &nbsp;');
+													
+													if ($mnOpcion == 1)
+														echo('<input type="radio" name="optFiltro" id="optFiltro2" onchange="fxCambiaOpcion()" checked>Todos los registros');
+													else
+														echo('<input type="radio" name="optFiltro" id="optFiltro2" onchange="fxCambiaOpcion()">Todos los registros');
+												?>
+											</div>
 										</div>
 									</div>
+
 									<div class="row">
 										<div class="col-md-12">
 											<table id="grid" class="table table-condensed table-hover table-striped" data-selection="true" data-multi-select="false" data-row-select="true" data-keep-selection="true" style="font-size:small">
@@ -129,10 +178,20 @@
 												<tbody>
 												<?php
 													$texto = "";
-													$msConsulta = "select PAGO_REL, FECHA_040, RECIBO_040, NOMBRE_040, CONCEPTO_040, MONTO_040, (case MONEDA_040 when 0 then 'Córdobas' else 'Dólares' end) as MONEDA_040, ";
-													$msConsulta .= "(case ANULADO_040 when 1 then 'x' else '' end) as ANULADO_040 from KDSA040A where OTROINGRESO_040 = 0 order by PAGO_REL desc";
-													$mPagos = $m_cnx_MySQL->prepare($msConsulta);
-													$mPagos->execute();
+													if ($mnOpcion == 0)
+													{
+														$msConsulta = "select PAGO_REL, FECHA_040, concat(SERIE_040, ' ', RECIBO_040) as RECIBO_040, NOMBRE_040, CONCEPTO_040, MONTO_040, (case MONEDA_040 when 0 then 'Córdobas' else 'Dólares' end) as MONEDA_040, ";
+														$msConsulta .= "(case ANULADO_040 when 1 then 'x' else '' end) as ANULADO_040 from KDSA040A where OTROINGRESO_040 = 0 and year(FECHA_040) = ? order by PAGO_REL desc";
+														$mPagos = $m_cnx_MySQL->prepare($msConsulta);
+														$mPagos->execute([$mnAnno]);
+													}
+													else
+													{
+														$msConsulta = "select PAGO_REL, FECHA_040, concat(SERIE_040, ' ', RECIBO_040) as RECIBO_040, NOMBRE_040, CONCEPTO_040, MONTO_040, (case MONEDA_040 when 0 then 'Córdobas' else 'Dólares' end) as MONEDA_040, ";
+														$msConsulta .= "(case ANULADO_040 when 1 then 'x' else '' end) as ANULADO_040 from KDSA040A where OTROINGRESO_040 = 0 order by PAGO_REL desc";
+														$mPagos = $m_cnx_MySQL->prepare($msConsulta);
+														$mPagos->execute();
+													}
 
 													while ($Fila = $mPagos->fetch())
 													{
@@ -173,6 +232,8 @@
 <script src="js/jquery.redirect.js"></script>
 <script type='text/javascript'>
 	$(function() {
+		var msRecibo = "";
+
 		function init(){
 			$("#estudiantes").bootgrid({
 				formatters: {
@@ -219,6 +280,11 @@
 			}
 		});
 
+		$("#grid").bootgrid().on("selected.rs.jquery.bootgrid", function(e, rows)
+		{
+			msRecibo = rows[0]['RECIBO_040'];
+		})
+
 		$("#print").on("click", function() {
 			if ($.trim($("#grid").bootgrid("getSelectedRows")) != "")
 			{
@@ -227,4 +293,20 @@
 			}
 		});
 	});
+
+	function fxCambiaOpcion(){
+		var mnOpcion;
+		var mnAnno;
+
+		if (document.getElementById("optFiltro1").checked == true){
+			mnOpcion = 0;
+			mnAnno = $("#cboAnno").val();
+		}
+		else{
+			mnOpcion = 1;
+			mnAnno = 0;
+		}
+
+		$.redirect("gridPagos.php", {mnOpcion: mnOpcion, mnAnno: mnAnno}, "POST");
+	}
 </script>
