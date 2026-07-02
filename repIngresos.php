@@ -188,19 +188,19 @@ $pdf->SetFont('arial','',7);
 //Obtención de datos
 $msConsulta = "select * from (";
 $msConsulta .= "select FECHA_040, NOMBRE_040, RECIBO_040, TIPOPAGO_040, TIPOCAMBIO_040, MONEDA_040, CONCEPTO_040, sum(MONTO_041) as MONTO, 0 as RETENCION, ";
-$msConsulta .= "KDSA020A.CURSO_REL, NOMBRE_020, CONVOCATORIA_020 from KDSA040A, KDSA041A, KDSA050A, KDSA020A ";
+$msConsulta .= "KDSA020A.CURSO_REL, NOMBRE_020, CONVOCATORIA_020, ANULADO_040 from KDSA040A, KDSA041A, KDSA050A, KDSA020A ";
 $msConsulta .= "where KDSA040A.PAGO_REL = KDSA041A.PAGO_REL and KDSA041A.COBRO_REL = KDSA050A.COBRO_REL and OTROINGRESO_040 = 0 and ";
-$msConsulta .= "KDSA050A.CURSO_REL = KDSA020A.CURSO_REL and EMPRESARIAL_040 = 0 and INATEC_040 = 0 and ANULADO_040 = 0 and SERIE_040 = ? and ";
-$msConsulta .= "FECHA_040 between ? and ? group by KDSA041A.PAGO_REL ";
+$msConsulta .= "KDSA050A.CURSO_REL = KDSA020A.CURSO_REL and EMPRESARIAL_040 = 0 and INATEC_040 = 0 and SERIE_040 = ? and ";
+$msConsulta .= "FECHA_040 between ? and ? group by KDSA041A.PAGO_REL, KDSA020A.CURSO_REL ";
 $msConsulta .= "union ";
 $msConsulta .= "select FECHA_040, NOMBRE_040, RECIBO_040, TIPOPAGO_040, TIPOCAMBIO_040, MONEDA_040, CONCEPTO_040, MONTO_040 as MONTO, RETENCION_DGI_040 + RETENCION_ALCALDIA_040 as RETENCION, ";
-$msConsulta .= "'' as CURSO_REL, '' as NOMBRE_020, '' as CONVOCATORIA_020 from KDSA040A where OTROINGRESO_040 = 1 and ANULADO_040 = 0 and SERIE_040  = ? and FECHA_040 between ? and ? ";
+$msConsulta .= "'' as CURSO_REL, '' as NOMBRE_020, '' as CONVOCATORIA_020, ANULADO_040 from KDSA040A where OTROINGRESO_040 = 1 and SERIE_040  = ? and FECHA_040 between ? and ? ";
 $msConsulta .= "union ";
 $msConsulta .= "select FECHA_040, NOMBRE_040, RECIBO_040, TIPOPAGO_040, TIPOCAMBIO_040, MONEDA_040, CONCEPTO_040, sum(MONTO_042) as MONTO, sum(RETENCION_DGI_042 + RETENCION_ALCALDIA_042) as RETENCION, ";
-$msConsulta .= "KDSA020A.CURSO_REL, NOMBRE_020, CONVOCATORIA_020 from KDSA040A, KDSA042A, KDSA050A, KDSA020A ";
+$msConsulta .= "KDSA020A.CURSO_REL, NOMBRE_020, CONVOCATORIA_020, ANULADO_040 from KDSA040A, KDSA042A, KDSA050A, KDSA020A ";
 $msConsulta .= "where KDSA040A.PAGO_REL = KDSA042A.PAGO_REL and KDSA042A.COBRO_REL = KDSA050A.COBRO_REL and ANULADO_040 = 0  and OTROINGRESO_040 = 0 and ";
-$msConsulta .= "KDSA050A.CURSO_REL = KDSA020A.CURSO_REL and EMPRESARIAL_040 = 1 and INATEC_040 = 0 and ANULADO_040 = 0 and SERIE_040 = ? and ";
-$msConsulta .= "FECHA_040 between ? and ? group by KDSA042A.PAGO_REL";
+$msConsulta .= "KDSA050A.CURSO_REL = KDSA020A.CURSO_REL and EMPRESARIAL_040 = 1 and INATEC_040 = 0 and SERIE_040 = ? and ";
+$msConsulta .= "FECHA_040 between ? and ? group by KDSA042A.PAGO_REL, KDSA020A.CURSO_REL";
 $msConsulta .= ") as A order by A.FECHA_040, A.RECIBO_040";
 
 $m_cnx_MySQL = fxAbrirConexion();
@@ -224,10 +224,22 @@ while ($Fila = $mDatos->fetch())
 	$Fecha = $Fila["FECHA_040"];
 	$Recibo = $Fila["RECIBO_040"];
 	$Nombre = utf8_decode(html_entity_decode($Fila["NOMBRE_040"]));
-	$Concepto = utf8_decode(html_entity_decode($Fila["CONCEPTO_040"]));
 	$Moneda = $Fila["MONEDA_040"];
-	$Monto = $Fila["MONTO"];
-	$Retencion = $Fila["RETENCION"];
+	$Anulado = $Fila["ANULADO_040"];
+
+	if ($Anulado == 0)
+	{
+		$Monto = $Fila["MONTO"];
+		$Retencion = $Fila["RETENCION"];
+		$Concepto = utf8_decode(html_entity_decode($Fila["CONCEPTO_040"]));
+	}
+	else
+	{
+		$Monto = 0;
+		$Retencion = 0;
+		$Concepto = "A N U L A D O";
+	}
+	
 	$TipoPago = $Fila["TIPOPAGO_040"];
 	$TipoCambio = $Fila["TIPOCAMBIO_040"];
 	$CodCurso = $Fila["CURSO_REL"];
