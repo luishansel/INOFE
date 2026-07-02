@@ -230,40 +230,42 @@ else
 		$pdf->Cell(130,10,$msTexto,0,0,'L');
 
 		$img_file = 'imagenes/firmalesvin.jpg';
-		$pdf->Image($img_file, 70, 165, 40, 0, '', '', '', false, 300, '', false, false, 0);
-
+		$pdf->Image($img_file, 105, 165, 40, 0, '', '', '', false, 300, '', false, false, 0);
+/* LHVG20260702
 		$img_file = 'imagenes/firmajovania.jpg';
 		$pdf->StartTransform();
 		$pdf->Rotate(-18, 158, 160);
 		$pdf->Image($img_file, 158, 160, 35, 0, '', '', '', false, 300, '', false, false, 0);
 		$pdf->StopTransform();
-
+*/
 		if ($fila["CERTDIGITAL_030"] == 1 or $fila["CERTDIGITAL_020"] == 1)
 		{
 			$img_file = 'imagenes/selloDireccion.jpg';
-			$pdf->Image($img_file, 110, 158, 34, 0, '', '', '', false, 300, '', false, false, 0);
-
+			$pdf->Image($img_file, 150, 158, 34, 0, '', '', '', false, 300, '', false, false, 0);
+/* LHVG20260702
 			$img_file = 'imagenes/selloRegistro.jpg';
 			$pdf->Image($img_file, 189, 158, 34, 0, '', '', '', false, 300, '', false, false, 0);
+*/
 		}
 
 		$pdf->SetFont('times', 'B', 12);
 		$msRotulo = 'Lic. Lesvin Castillo H.';
-		$pdf->setXY(63,186);
+		$pdf->setXY(100,186);
 		$pdf->Cell(50,5,$msRotulo,0,0,'C');
 
+/*  LHVG20260702
 		$msRotulo = 'Lic. Jovania Cárdenas B.';
 		$pdf->setXY(145,186);
 		$pdf->Cell(50,5,$msRotulo,0,0,'C');
-
+*/
 		$msRotulo = 'Dirección Académica';
-		$pdf->setXY(63,192);
+		$pdf->setXY(100,192);
 		$pdf->Cell(50,5,$msRotulo,0,0,'C');
-
+/* LHVG20260702
 		$msRotulo = 'Registro Académico';
 		$pdf->setXY(145,192);
 		$pdf->Cell(50,5,$msRotulo,0,0,'C');
-
+*/
 		//Código QR
 		$style = array(
 			'border' => false,
