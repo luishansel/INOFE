@@ -83,39 +83,41 @@
 							echo('<button id="remove" type="button" class="btn btn-warning" disabled>Anular</button>');
 					?>
                     
-                    <table id="grid" class="table table-condensed table-hover table-striped" data-selection="true" data-multi-select="false" data-row-select="true" data-keep-selection="true" style="font-size:small">
-                    	<thead>
-                            <tr>
-                                <th data-column-id="COBRO_REL" data-identifier="true" data-align="left" data-header-align="left" data-width="10%">Cobro</th>
-                                <th data-column-id="NOMBRE_020" data-align="left" data-header-align="left">Curso</th>
-                                <th data-column-id="CONCEPTO_050" data-align="left" data-header-align="left" data-width="25%">Concepto</th>
-                                <th data-column-id="TIPO_050" data-align="left" data-header-align="left" data-width="10%">Tipo</th>
-                                <th data-column-id="FECHAPREVISTA_050" data-align="center" data-header-align="center" data-width="10%">Fecha prevista</th>
-                                <th data-column-id="ACTIVO_050" data-align="center" data-header-align="center" data-width="8%">Activo</th>
-                                <th data-column-id="ANULADO_050" data-align="center" data-header-align="center" data-width="8%">Anulado</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        <?php
-							$mDatos = fxDevuelveCobros(1);
+					<div class="table-responsive">
+						<table id="grid" class="table table-condensed table-hover table-striped" data-selection="true" data-multi-select="false" data-row-select="true" data-keep-selection="true" style="font-size:small">
+							<thead>
+								<tr>
+									<th data-column-id="COBRO_REL" data-identifier="true" data-align="left" data-header-align="left" data-width="10%">Cobro</th>
+									<th data-column-id="NOMBRE_020" data-align="left" data-header-align="left">Curso</th>
+									<th data-column-id="CONCEPTO_050" data-align="left" data-header-align="left" data-width="25%">Concepto</th>
+									<th data-column-id="TIPO_050" data-align="left" data-header-align="left" data-width="10%">Tipo</th>
+									<th data-column-id="FECHAPREVISTA_050" data-align="center" data-header-align="center" data-width="10%">Fecha prevista</th>
+									<th data-column-id="ACTIVO_050" data-align="center" data-header-align="center" data-width="8%">Activo</th>
+									<th data-column-id="ANULADO_050" data-align="center" data-header-align="center" data-width="8%">Anulado</th>
+								</tr>
+							</thead>
+							<tbody>
+							<?php
+								$mDatos = fxDevuelveCobros(1);
 
-							while ($Fila = $mDatos->fetch())
-							{
-								echo ("<tr>");
-								echo ("<td>" . $Fila["COBRO_REL"] . "</td>");
-								echo ("<td>" . $Fila["NOMBRE_020"] . " (" . $Fila["CONVOCATORIA_020"] . " / G" . $Fila["GRUPO_020"] . ")</td>");
-								echo ("<td>" . $Fila["CONCEPTO_050"] . "</td>");
-								echo ("<td>" . $Fila["TIPO_050"] . "</td>");
-								$fecha = date_create_from_format('Y-m-d', $Fila["FECHAPREVISTA_050"]);
-								echo ("<td>" . date_format($fecha, 'd-m-Y') . "</td>");
-								echo ("<td>" . $Fila["ACTIVO_050"] . "</td>");
-								echo ("<td>" . $Fila["ANULADO_050"] . "</td>");
-								echo ("</tr>");
+								while ($Fila = $mDatos->fetch())
+								{
+									echo ("<tr>");
+									echo ("<td>" . $Fila["COBRO_REL"] . "</td>");
+									echo ("<td>" . $Fila["NOMBRE_020"] . " (" . $Fila["CONVOCATORIA_020"] . " / G" . $Fila["GRUPO_020"] . ")</td>");
+									echo ("<td>" . $Fila["CONCEPTO_050"] . "</td>");
+									echo ("<td>" . $Fila["TIPO_050"] . "</td>");
+									$fecha = date_create_from_format('Y-m-d', $Fila["FECHAPREVISTA_050"]);
+									echo ("<td>" . date_format($fecha, 'd-m-Y') . "</td>");
+									echo ("<td>" . $Fila["ACTIVO_050"] . "</td>");
+									echo ("<td>" . $Fila["ANULADO_050"] . "</td>");
+									echo ("</tr>");
+								}
 							}
-						}
-						?>
-                        </tbody>
-                	</table>
+							?>
+							</tbody>
+						</table>
+					</div>
         		</div>
             </div>
             </div>

@@ -10,7 +10,9 @@
     {
         $txtCodPago = $_POST["txtCodPago"];
 
-        $msConsulta = "select PAGO_REL, FECHA_040, NOMBRE_040, RECIBO_040, SERIE_040, MONTO_040, MONEDA_040, TIPOCAMBIO_040, TIPOPAGO_040, CONCEPTO_040 from KDSA040A where PAGO_REL = ?";
+        $msConsulta = "select PAGO_REL, FECHA_040, NOMBRE_040, RECIBO_040, SERIE_040, MONTO_040, ";
+        $msConsulta .= "MONEDA_040, TIPOCAMBIO_040, TIPOPAGO_040, CONCEPTO_040, NUMEROCK_040, BANCOCK_040 ";
+        $msConsulta .= "from KDSA040A where PAGO_REL = ?";
         $mDatos = $m_cnx_MySQL->prepare($msConsulta);
 		$mDatos->execute([$txtCodPago]);
 		$Fila = $mDatos->fetch();
@@ -24,6 +26,8 @@
         $txnTipoCambio = $Fila["TIPOCAMBIO_040"];
         $optTipoPago = $Fila["TIPOPAGO_040"];
         $txtConcepto = $Fila["CONCEPTO_040"];
+        $txtReferencia = $Fila["NUMEROCK_040"];
+        $txtBanco = $Fila["BANCOCK_040"];
     }
 
     if (isset($_POST["cmdGuardar"]))
@@ -68,11 +72,13 @@
                 $txnTipoCambio = $_POST["txnTipoCambio"];
                 $optTipoPago = $_POST["optTipoPago"];
                 $txtConcepto = $_POST["txtConcepto"];
+                $txtReferencia = $_POST["txtReferencia"];
+                $txtBanco = $_POST["txtBanco"];
 
                 $msConsulta = "update KDSA040A set FECHA_040 = ?, NOMBRE_040 = ?, RECIBO_040 = ?, SERIE_040 = ?, MONTO_040 = ?, MONEDA_040 = ?, ";
-                $msConsulta .= "TIPOCAMBIO_040 = ?, CONCEPTO_040 = ?, TIPOPAGO_040 = ? where PAGO_REL = ?";
+                $msConsulta .= "TIPOCAMBIO_040 = ?, CONCEPTO_040 = ?, TIPOPAGO_040 = ?, NUMEROCK_040 = ?, BANCOCK_040 = ? where PAGO_REL = ?";
                 $mDatos = $m_cnx_MySQL->prepare($msConsulta);
-		        $mDatos->execute([$dtpFecha, $txtNombre, $txtRecibo, $optSerie, $txnMonto, $optMoneda, $txnTipoCambio, $txtConcepto, $optTipoPago, $txtCodPago]);
+		        $mDatos->execute([$dtpFecha, $txtNombre, $txtRecibo, $optSerie, $txnMonto, $optMoneda, $txnTipoCambio, $txtConcepto, $optTipoPago, $txtReferencia, $txtBanco, $txtCodPago]);
                 ?>
                     <script>alert("Registro modificado");</script>
                 <?php
@@ -105,7 +111,7 @@
 <body>
     <form id="hrrRecibos" name="hrrRecibos" action="hrrRecibos.php" method="POST">
         <div width="50%" style="margin-left: 20%; margin-top: 2%">
-        <h1>KDSA</h1>
+        <h1>INOFE</h1>
             <table>
                 <tr>
                     <td class="ctrlAnchoFijo"><label for="txtCodPago">Código del Pago</label></td>
@@ -126,11 +132,11 @@
                     <td><input class="ctrlAnchoFijo" type="text" id="txtUsuario" name="txtUsuario" placeholder="Usuario" value=""/></td>
                 </tr>
                 <tr>
-                    <td class="tdAnchoFijo"><label for="txtClave">Contraseña</label></td>
+                    <td class="ctrlAnchoFijo"><label for="txtClave">Contraseña</label></td>
                     <td><input class="ctrlAnchoFijo" type="password" id="txtClave" name="txtClave" placeholder="Contraseña" value=""/></td>
                 </tr>
                 <tr>
-                    <td class="tdAnchoFijo"><label for="dtpFecha">Fecha del pago</label></td>
+                    <td class="ctrlAnchoFijo"><label for="dtpFecha">Fecha del pago</label></td>
                     <?php
                         if ($txtCodPago == "")
                             echo('<td><input class="ctrlAnchoFijo" type="date" id="dtpFecha" name="dtpFecha" value=""/></td>');
@@ -139,7 +145,7 @@
                     ?>
                 </tr>
                 <tr>
-                    <td class="tdAnchoFijo"><label for="txtNombre">Nombre</label></td>
+                    <td class="ctrlAnchoFijo"><label for="txtNombre">Nombre</label></td>
                     <?php
                         if ($txtCodPago == "")
                             echo('<td><input class="ctrlAnchoDoble" type="text" id="txtNombre" name="txtNombre" placeholder="Nombre" value=""/></td>');
@@ -148,7 +154,7 @@
                     ?>
                 </tr>
                 <tr>
-                    <td class="tdAnchoFijo"><label for="txtRecibo">Recibo</label></td>
+                    <td class="ctrlAnchoFijo"><label for="txtRecibo">Recibo</label></td>
                     <?php
                         if ($txtCodPago == "")
                             echo('<td><input class="ctrlAnchoFijo" type="text" id="txtRecibo" name="txtRecibo" placeholder="Recibo" value=""/></td>');
@@ -157,7 +163,7 @@
                     ?>
                 </tr>
                 <tr>
-                    <td class="tdAnchoFijo"><label for="optSerie">Serie</label></td>
+                    <td class="ctrlAnchoFijo"><label for="optSerie">Serie</label></td>
                     <td>
                         <?php
                             if ($txtCodPago == "" or $optSerie == "A")
@@ -174,7 +180,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td class="tdAnchoFijo"><label for="txnMonto">Monto</label></td>
+                    <td class="ctrlAnchoFijo"><label for="txnMonto">Monto</label></td>
                     <?php
                         if ($txtCodPago == "")
                             echo('<td><input class="ctrlAnchoFijo" type="number" id="txnMonto" name="txnMonto" placeholder="Monto" step="0.01" value="" readonly/></td>');
@@ -183,7 +189,7 @@
                     ?>
                 </tr>
                 <tr>
-                    <td class="tdAnchoFijo"><label for="optMoneda">Moneda</label></td>
+                    <td class="ctrlAnchoFijo"><label for="optMoneda">Moneda</label></td>
                     <td>
                         <?php
                             if ($txtCodPago == "" or $optMoneda == 0)
@@ -200,7 +206,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td class="tdAnchoFijo"><label for="txnTipoCambio">Tipo de cambio</label></td>
+                    <td class="ctrlAnchoFijo"><label for="txnTipoCambio">Tipo de cambio</label></td>
                     <?php
                         if ($txtCodPago == "")
                             echo('<td><input class="ctrlAnchoFijo" type="number" id="txnTipoCambio" name="txnTipoCambio" placeholder="Tipo de cambio" step="0.01" value=""/></td>');
@@ -209,7 +215,7 @@
                     ?>
                 </tr>
                 <tr>
-                    <td class="tdAnchoFijo"><label for="optTipoPago">Tipo de pago</label></td>
+                    <td class="ctrlAnchoFijo"><label for="optTipoPago">Tipo de pago</label></td>
                     <td>
                     <?php
                         if ($txtCodPago == "" or $optTipoPago == 0)
@@ -217,7 +223,7 @@
                             echo('<input type="radio" id="optEfectivo" name="optTipoPago" value = "0" checked/>Efectivo');
                             echo('<input type="radio" id="optTarjeta" name="optTipoPago" value = "1" />Tarjeta');
                             echo('<input type="radio" id="optCheque" name="optTipoPago" value = "2" />Cheque');
-                            echo('<input type="radio" id="optBanpro" name="optTipoPago" value = "3" />Depósito BANPRO');
+                            echo('<input type="radio" id="optFicohsa" name="optTipoPago" value = "3" />Depósito FICOHSA');
                             echo('<input type="radio" id="optBac" name="optTipoPago" value = "4" />Depósito BAC');
                             echo('<input type="radio" id="optCommerce" name="optTipoPago" value = "5" />eCommerce');
                         }
@@ -227,7 +233,7 @@
                             echo('<input type="radio" id="optEfectivo" name="optTipoPago" value = "0" />Efectivo');
                             echo('<input type="radio" id="optTarjeta" name="optTipoPago" value = "1" checked/>Tarjeta');
                             echo('<input type="radio" id="optCheque" name="optTipoPago" value = "2" />Cheque');
-                            echo('<input type="radio" id="optBanpro" name="optTipoPago" value = "3" />Depósito BANPRO');
+                            echo('<input type="radio" id="optFicohsa" name="optTipoPago" value = "3" />Depósito FICOHSA');
                             echo('<input type="radio" id="optBac" name="optTipoPago" value = "4" />Depósito BAC');
                             echo('<input type="radio" id="optCommerce" name="optTipoPago" value = "5" />eCommerce');
                         }
@@ -237,7 +243,7 @@
                             echo('<input type="radio" id="optEfectivo" name="optTipoPago" value = "0" />Efectivo');
                             echo('<input type="radio" id="optTarjeta" name="optTipoPago" value = "1" />Tarjeta');
                             echo('<input type="radio" id="optCheque" name="optTipoPago" value = "2" checked/>Cheque');
-                            echo('<input type="radio" id="optBanpro" name="optTipoPago" value = "3" />Depósito BANPRO');
+                            echo('<input type="radio" id="optFicohsa" name="optTipoPago" value = "3" />Depósito FICOHSA');
                             echo('<input type="radio" id="optBac" name="optTipoPago" value = "4" />Depósito BAC');
                             echo('<input type="radio" id="optCommerce" name="optTipoPago" value = "5" />eCommerce');
                         }
@@ -247,7 +253,7 @@
                             echo('<input type="radio" id="optEfectivo" name="optTipoPago" value = "0" />Efectivo');
                             echo('<input type="radio" id="optTarjeta" name="optTipoPago" value = "1" />Tarjeta');
                             echo('<input type="radio" id="optCheque" name="optTipoPago" value = "2" />Cheque');
-                            echo('<input type="radio" id="optBanpro" name="optTipoPago" value = "3" checked/>Depósito BANPRO');
+                            echo('<input type="radio" id="optFicohsa" name="optTipoPago" value = "3" checked/>Depósito FICOHSA');
                             echo('<input type="radio" id="optBac" name="optTipoPago" value = "4" />Depósito BAC');
                             echo('<input type="radio" id="optCommerce" name="optTipoPago" value = "5" />eCommerce');
                         }
@@ -257,7 +263,7 @@
                             echo('<input type="radio" id="optEfectivo" name="optTipoPago" value = "0" />Efectivo');
                             echo('<input type="radio" id="optTarjeta" name="optTipoPago" value = "1" />Tarjeta');
                             echo('<input type="radio" id="optCheque" name="optTipoPago" value = "2" />Cheque');
-                            echo('<input type="radio" id="optBanpro" name="optTipoPago" value = "3" />Depósito BANPRO');
+                            echo('<input type="radio" id="optFicohsa" name="optTipoPago" value = "3" />Depósito FICOHSA');
                             echo('<input type="radio" id="optBac" name="optTipoPago" value = "4" checked/>Depósito BAC');
                             echo('<input type="radio" id="optCommerce" name="optTipoPago" value = "5" />eCommerce');
                         }
@@ -267,7 +273,7 @@
                             echo('<input type="radio" id="optEfectivo" name="optTipoPago" value = "0" />Efectivo');
                             echo('<input type="radio" id="optTarjeta" name="optTipoPago" value = "1" />Tarjeta');
                             echo('<input type="radio" id="optCheque" name="optTipoPago" value = "2" />Cheque');
-                            echo('<input type="radio" id="optBanpro" name="optTipoPago" value = "3" />Depósito BANPRO');
+                            echo('<input type="radio" id="optFicohsa" name="optTipoPago" value = "3" />Depósito FICOHSA');
                             echo('<input type="radio" id="optBac" name="optTipoPago" value = "4" />Depósito BAC');
                             echo('<input type="radio" id="optCommerce" name="optTipoPago" value = "5" checked/>eCommerce');
                         }
@@ -275,7 +281,25 @@
                     </td>
                 </tr>
                 <tr>
-                    <td class="tdAnchoFijo"><label for="txtConcepto">Concepto</label></td>
+                    <td class="ctrlAnchoFijo"><label for="txtReferencia">Referencia</label></td>
+                    <?php
+                        if ($txtCodPago == "")
+                            echo('<td><input class="ctrlAnchoFijo" type="text" id="txtReferencia" name="txtReferencia" placeholder="Referencia" value=""/></td>');
+                        else
+                            echo('<td><input class="ctrlAnchoFijo" type="text" id="txtReferencia" name="txtReferencia" placeholder="Referencia" value="' . trim($txtReferencia) . '"/></td>');
+                    ?>
+                </tr>
+                <tr>
+                    <td class="ctrlAnchoFijo"><label for="txtBanco">Banco</label></td>
+                    <?php
+                        if ($txtCodPago == "")
+                            echo('<td><input class="ctrlAnchoFijo" type="text" id="txtBanco" name="txtBanco" placeholder="Banco" value=""/></td>');
+                        else
+                            echo('<td><input class="ctrlAnchoFijo" type="text" id="txtBanco" name="txtBanco" placeholder="Banco" value="' . trim($txtBanco) . '"/></td>');
+                    ?>
+                </tr>
+                <tr>
+                    <td class="ctrlAnchoFijo"><label for="txtConcepto">Concepto</label></td>
                     <?php
                         if ($txtCodPago == "")
                             echo('<td><textarea id="txtConcepto" name="txtConcepto" placeholder="Concepto" rows="2" cols="48"/></textarea></td>');
@@ -284,7 +308,7 @@
                     ?>
                 </tr>
                 <tr>
-                    <td class="tdAnchoFijo"></td>
+                    <td class="ctrlAnchoFijo"></td>
                     <?php
                     if ($txtCodPago == "")
                     {

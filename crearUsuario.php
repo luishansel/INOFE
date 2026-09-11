@@ -42,7 +42,7 @@
 
 		if (fxExisteUsuario($Codigo) == 0)
 		{
-			fxGuardarUsuario ($Codigo, $Nombre, "", $Clave, $SupervisorDB);
+			fxGuardarUsuario ($Codigo, $Nombre, "", $Clave, 0, $SupervisorDB);
             ?>
     			<script>
     				$.messager.alert('INOFE','El Usuario se guardó.','warning');

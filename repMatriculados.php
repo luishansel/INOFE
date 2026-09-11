@@ -30,6 +30,7 @@ else
 		public $Horario;
 		public $DiasClase;
 		public $Convocatoria;
+		public $codCurso;
 		
 		// Page header
 		function Header()
@@ -46,7 +47,13 @@ else
 			
 			//DATOS DEL CURSO
 			$this->SetTextColor(0,0,0);
+
+			$this->SetFont('helvetica','B',8);
+			$this->Text(50, $Linea, mb_convert_encoding('Código:', "UTF-8"));
+			$this->SetFont('helvetica','',8);
+			$this->Text(75, $Linea, $this->codCurso);
 			
+			$Linea += 5;
 			$this->SetFont('helvetica','B',8);
 			$this->Text(50, $Linea, 'Curso:');
 			$this->SetFont('helvetica','',8);
@@ -143,7 +150,7 @@ else
 
 	//Obtención de datos
 	$msConsulta = "select KDSA030A.MATRICULA_REL, KDSA030A.ESTUDIANTE_REL, concat(trim(APELLIDOS_010), ', ', trim(NOMBRES_010)) as NOMBRECOMPLETO, MAXIMO_020, NOMBRE_020, FECHAINI_020, ";
-	$msConsulta .= "FECHAFIN_020, HORAINI_020, HORAFIN_020, fxDevuelveDias(KDSA020A.CURSO_REL) as DIASCLASE, CONVOCATORIA_020, CELULAR_010, CORREO_010, ESTADO_030, TIPOASISTENCIA_020, TIPOASISTENCIA_030 ";
+	$msConsulta .= "FECHAFIN_020, HORAINI_020, HORAFIN_020, fxDevuelveDias(KDSA020A.CURSO_REL) as DIASCLASE, CONVOCATORIA_020, GRUPO_020, CELULAR_010, CORREO_010, ESTADO_030, TIPOASISTENCIA_020, TIPOASISTENCIA_030 ";
 	$msConsulta .= "from KDSA030A, KDSA010A, KDSA020A where KDSA030A.ESTUDIANTE_REL = KDSA010A.ESTUDIANTE_REL and KDSA030A.CURSO_REL = KDSA020A.CURSO_REL ";
 	$msConsulta .= "and KDSA030A.ESTADO_030 <> 4 and KDSA030A.CURSO_REL = ?";
 
@@ -175,7 +182,7 @@ else
 	$HoraFin = date_create($Fila["HORAFIN_020"]);
 	$Horario = "De " . date_format($HoraIni, 'h:i a') . " a " . date_format($HoraFin, 'h:i a');
 	$DiasClase = $Fila["DIASCLASE"];
-	$Convocatoria = $Fila["CONVOCATORIA_020"];
+	$Convocatoria = $Fila["CONVOCATORIA_020"] . ' / G' . $Fila["GRUPO_020"];
 
 	$pdf = new PDF(PDF_PAGE_ORIENTATION, PDF_UNIT, PDF_PAGE_FORMAT, true, 'UTF-8', false);
 
@@ -196,6 +203,7 @@ else
 	$pdf->Horario=$Horario;
 	$pdf->DiasClase=$DiasClase;
 	$pdf->Convocatoria=$Convocatoria;
+	$pdf->codCurso=$codCurso;
 	$pdf->AddPage();
 
 	if ($Registros > 0)
@@ -224,7 +232,7 @@ else
 		$msHTML .= "</thead>";
 		$msHTML .= "<tbody>";
 		
-		$Linea = 50;
+		$Linea = 55;
 		$mbFondo = 0;
 		for ($i = 0; $i < $Registros; $i++)
 		{
@@ -345,6 +353,7 @@ else
 		$msHTML .= "</tr>";
 		$msHTML .= "</table>";
 
+		$pdf->SetY($Linea);
 		$pdf->writeHTML($msHTML);
 		$pdf->Output();
 	}

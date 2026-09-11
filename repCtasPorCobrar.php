@@ -136,7 +136,7 @@ $pdf->SetFont('helvetica','',8);
 //Obtención de datos
 if ($Activos == 1)
 {
-	$msConsulta = "select KDSA051A.MATRICULA_REL, CELULAR_010, concat(APELLIDOS_010, ', ', NOMBRES_010) as ESTUDIANTE, CONCEPTO_050, ADEUDADO_051 ";
+	$msConsulta = "select KDSA051A.MATRICULA_REL, CELULAR_010, concat(APELLIDOS_010, ', ', NOMBRES_010) as ESTUDIANTE, CONCEPTO_050, KDSA050A.CURSO_REL, ADEUDADO_051 ";
 	$msConsulta .= "from KDSA051A, KDSA030A, KDSA010A, KDSA050A, KDSA020A where PAGADO_051 = 0 and EXONERADO_051 = 0 and ANULADO_051 = 0 and ANULADO_050 = 0 and ";
 	$msConsulta .= "KDSA051A.MATRICULA_REL = KDSA030A.MATRICULA_REL and KDSA030A.ESTUDIANTE_REL = KDSA010A.ESTUDIANTE_REL and KDSA030A.CURSO_REL = KDSA020A.CURSO_REL ";
 	$msConsulta .= "and KDSA051A.COBRO_REL = KDSA050A.COBRO_REL and ESTADO_030 in (0, 1, 3) and FECHAPREVISTA_050 <= ? ";
@@ -144,7 +144,7 @@ if ($Activos == 1)
 }
 else
 {
-	$msConsulta = "select KDSA051A.MATRICULA_REL, CELULAR_010, concat(APELLIDOS_010, ', ', NOMBRES_010) as ESTUDIANTE, CONCEPTO_050, ADEUDADO_051 ";
+	$msConsulta = "select KDSA051A.MATRICULA_REL, CELULAR_010, concat(APELLIDOS_010, ', ', NOMBRES_010) as ESTUDIANTE, CONCEPTO_050, KDSA050A.CURSO_REL, ADEUDADO_051 ";
 	$msConsulta .= "from KDSA051A, KDSA030A, KDSA010A, KDSA050A, KDSA020A where PAGADO_051 = 0 and EXONERADO_051 = 0 and ANULADO_051 = 0 and ANULADO_050 = 0 and ";
 	$msConsulta .= "KDSA051A.MATRICULA_REL = KDSA030A.MATRICULA_REL and KDSA030A.ESTUDIANTE_REL = KDSA010A.ESTUDIANTE_REL and KDSA030A.CURSO_REL = KDSA020A.CURSO_REL ";
 	$msConsulta .= "and KDSA051A.COBRO_REL = KDSA050A.COBRO_REL and ESTADO_030 in (0, 1, 3) and FECHAPREVISTA_050 <= ? ";
@@ -169,8 +169,9 @@ $msHTML .= "<table>";
 $msHTML .= "<thead>";
 $msHTML .= "<tr>";
 $msHTML .= '<th style="width: 10%;">Celular</th>';
-$msHTML .= '<th style="width: 40%;">Estudiante</th>';
-$msHTML .= '<th style="width: 40%;">Concepto</th>';
+$msHTML .= '<th style="width: 30%;">Estudiante</th>';
+$msHTML .= '<th style="width: 15%;">Curso</th>';
+$msHTML .= '<th style="width: 35%;">Concepto</th>';
 $msHTML .= '<th style="width: 10%; text-align: right;">Monto</th>';
 $msHTML .= "</tr>";
 $msHTML .= "</thead>";
@@ -181,6 +182,7 @@ while ($Fila = $mDatos->fetch())
 	$Matricula = $Fila["MATRICULA_REL"];
 	$Celular = $Fila["CELULAR_010"];
 	$Estudiante = mb_convert_encoding(html_entity_decode($Fila["ESTUDIANTE"]), "UTF-8");
+	$Curso = $Fila["CURSO_REL"];
 	$Concepto = mb_convert_encoding(html_entity_decode($Fila["CONCEPTO_050"]), "UTF-8");
 	$Monto = $Fila["ADEUDADO_051"];
 	
@@ -190,8 +192,9 @@ while ($Fila = $mDatos->fetch())
 	{
 		$msHTML .= "<tr>";
 		$msHTML .= '<td style="width: 10%;">' . $Celular . "</td>";
-		$msHTML .= '<td style="width: 40%;">' . $Estudiante . "</td>";
-		$msHTML .= '<td style="width: 40%;">' . $Concepto . "</td>";
+		$msHTML .= '<td style="width: 30%;">' . $Estudiante . "</td>";
+		$msHTML .= '<td style="width: 15%;">' . $Curso . "</td>";
+		$msHTML .= '<td style="width: 35%;">' . $Concepto . "</td>";
 		$msHTML .= '<td style="width: 10%; text-align: right;">' . number_format($Monto,2,'.',',') . "</td>";
 		$msHTML .= "</tr>";
 		$mbFondo = 1;
@@ -200,8 +203,9 @@ while ($Fila = $mDatos->fetch())
 	{
 		$msHTML .= "<tr>";
 		$msHTML .= '<td class="fondoGris" style="width: 10%;">' . $Celular . "</td>";
-		$msHTML .= '<td class="fondoGris" style="width: 40%;">' . $Estudiante . "</td>";
-		$msHTML .= '<td class="fondoGris" style="width: 40%;">' . $Concepto . "</td>";
+		$msHTML .= '<td class="fondoGris" style="width: 30%;">' . $Estudiante . "</td>";
+		$msHTML .= '<td class="fondoGris" style="width: 15%;">' . $Curso . "</td>";
+		$msHTML .= '<td class="fondoGris" style="width: 35%;">' . $Concepto . "</td>";
 		$msHTML .= '<td class="fondoGris" style="width: 10%; text-align: right;">' . number_format($Monto,2,'.',',') . "</td>";
 		$msHTML .= "</tr>";
 		$mbFondo = 0;

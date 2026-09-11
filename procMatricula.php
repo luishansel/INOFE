@@ -270,7 +270,10 @@
                                 <?php
 									if ($Codigo == "")
 									{
-										$msConsulta = "select CURSO_REL, NOMBRE_020, GRUPO_020, CONVOCATORIA_020, MAXIMO_020, ACTIVO_020 from KDSA020A where ACTIVO_020 = 1 and DATEDIFF(CURRENT_DATE, FECHAINI_020) < 15 order by NOMBRE_020";
+										if ($Administrador == 0)
+											$msConsulta = "select CURSO_REL, NOMBRE_020, GRUPO_020, CONVOCATORIA_020, MAXIMO_020, ACTIVO_020 from KDSA020A where ACTIVO_020 = 1 and DATEDIFF(CURRENT_DATE, FECHAINI_020) < 15 order by NOMBRE_020";
+										else
+											$msConsulta = "select CURSO_REL, NOMBRE_020, GRUPO_020, CONVOCATORIA_020, MAXIMO_020, ACTIVO_020 from KDSA020A where ACTIVO_020 = 1 order by NOMBRE_020";
 										$mDatos = $m_cnx_MySQL->prepare($msConsulta);
 										$mDatos->execute();
 									}
@@ -586,19 +589,48 @@
 	function verificarFormulario()
 	{
 		var administrador = <?php echo($Administrador); ?>;
+		var fechaIni = document.getElementById('dtpFechaIni').value
+		var fechaIni15 = fechaIni.setDate(fechaIni.getDate() + 15);
+		var fechaHoy = new Date();
+		var anno = fechaHoy.getFullYear();
+		var mes = fechaHoy.getMonth() + 1;
+		var dia = fechaHoy.getDate();
+		if (dia < 10)
+		{
+			if (mes < 10)
+				var fechaAhora = anno + "-0" + mes + "-0" + dia;
+			else
+				var fechaAhora = anno + "-" + mes + "-0" + dia;
+		}
+		else
+		{
+			if (mes < 10)
+				var fechaAhora = anno + "-0" + mes + "-" + dia;
+			else
+				var fechaAhora = anno + "-" + mes + "-" + dia;
+		}
 
 		if (document.getElementById('txtCodMatricula').value == "")
 		{
-			if (document.getElementById('txnDisponible').value == 0 && administrador == 0)
+			if (administrador == 0)
 			{
-				$.messager.alert('KDSA','Se alcanzó la cantidad máxima de alumnos para este curso.','warning');
-				return false;
+				if (document.getElementById('txnDisponible').value == 0)
+				{
+					$.messager.alert('INOFE','Se alcanzó la cantidad máxima de alumnos para este curso.','warning');
+					return false;
+				}
+
+				if (fechaIni15 <= fechaAhora)
+				{
+					$.messager.alert('INOFE','Ya han transcurrido 15 días o mas desde el inicio del curso. No es posible realizar la matrícula.','warning');
+					return false;
+				}
 			}
 		}
 
 		if(document.getElementById('txnDescuento').value>0 && document.getElementById('txtMotivo').value=="")
 		{
-			$.messager.alert('KDSA','Falta el Motivo del Descuento.','warning');
+			$.messager.alert('INFOE','Falta el Motivo del Descuento.','warning');
 			return false;
 		}
 	

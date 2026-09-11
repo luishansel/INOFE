@@ -80,7 +80,7 @@ else
 
 	$mnLinea = 52;
 	//FECHA
-	$pdf->Text(2, $mnLinea, $Dia);
+	$pdf->Text(4, $mnLinea, $Dia);
 	$pdf->Text(12, $mnLinea, $Mes);
 	$pdf->Text(25, $mnLinea, substr($Anno, -2));
 
@@ -186,16 +186,19 @@ else
 			$mnLinea += 40;
 			$pdf->Text(15, $mnLinea, "X");
 			$pdf->Text(25, $mnLinea, $mFila["NUMEROCK_040"]);
+			$pdf->Text(50, $mnLinea, $mFila["BANCOCK_040"]);
 			break;
 		case 4: //Depósito BAC
 			$mnLinea += 35;
 			$pdf->Text(15, $mnLinea, "X");
 			$pdf->Text(25, $mnLinea, $mFila["NUMEROCK_040"]);
+			$pdf->Text(50, $mnLinea, $mFila["BANCOCK_040"]);
 			break;
 		case 5: //eCommerce
 			$mnLinea += 28;
 			$pdf->Text(20, $mnLinea, "X");
 			$pdf->Text(30, $mnLinea, $mFila["NUMEROCK_040"]);
+			$pdf->Text(50, $mnLinea, $mFila["BANCOCK_040"]);
 			break;
 	}
 

@@ -304,50 +304,50 @@ if ($Registro == 0) {
 									echo ('</select>');
 									?>
 								</div>
-						</div>
-					</div>
-
-					<div class="form-group row">
-						<label for="optActivo" class="col-sm-12 col-md-2 form-label">Activo</label>
-						<div class="col-sm-12 col-md-4">
-							<div class="radio">
-								<?php
-								if ($Activo == 1 or $Codigo == "") {
-									echo ('<input type="radio" id="OptAct1" name="optActivo" value="0" /> No <input type="radio" id="OptAct2" name="optActivo" value="1" checked="checked" /> Si');
-								} else {
-									echo ('<input type="radio" id="OptAct1" name="optActivo" value="0" checked="checked" /> No <input type="radio" id="OptAct2" name="optActivo" value="1" /> Si');
-								}
-								?>
 							</div>
 						</div>
-					</div>
 
-					<div class="form-group row">
-						<label for="optAnulado" class="col-sm-12 col-md-2 form-label">Anulado</label>
-						<div class="col-sm-12 col-md-4">
-							<div class="radio">
-								<?php
-								if ($Anulado == 1) {
-									echo ('<input type="radio" id="Opcion1" name="optAnulado" value="0" disabled /> No <input type="radio" id="Opcion2" name="optAnulado" value="1" checked="checked" disabled /> Si');
-								} else {
-									echo ('<input type="radio" id="Opcion1" name="optAnulado" value="0" checked="checked" disabled /> No <input type="radio" id="Opcion2" name="optAnulado" value="1" disabled /> Si');
-								}
-								?>
+						<div class="form-group row">
+							<label for="optActivo" class="col-sm-12 col-md-2 form-label">Activo</label>
+							<div class="col-sm-12 col-md-4">
+								<div class="radio">
+									<?php
+									if ($Activo == 1 or $Codigo == "") {
+										echo ('<input type="radio" id="OptAct1" name="optActivo" value="0" /> No <input type="radio" id="OptAct2" name="optActivo" value="1" checked="checked" /> Si');
+									} else {
+										echo ('<input type="radio" id="OptAct1" name="optActivo" value="0" checked="checked" /> No <input type="radio" id="OptAct2" name="optActivo" value="1" /> Si');
+									}
+									?>
+								</div>
 							</div>
 						</div>
-					</div>
 
-					<div class="row">
-						<div class="col-auto col-xs-offset-none col-md-12 col-md-offset-2">
-							<?php
-							if ($Anulado == 1)
-								echo ('<input type="submit" id="Guardar" name="Guardar" value="Guardar" class="btn btn-warning" disabled />');
-							else
-								echo ('<input type="submit" id="Guardar" name="Guardar" value="Guardar" class="btn btn-warning" />');
-							?>
-							<input type="button" id="Cancelar" name="Cancelar" value="Cancelar" class="btn btn-warning" onclick="location.href='gridCobros.php';" />
+						<div class="form-group row">
+							<label for="optAnulado" class="col-sm-12 col-md-2 form-label">Anulado</label>
+							<div class="col-sm-12 col-md-4">
+								<div class="radio">
+									<?php
+									if ($Anulado == 1) {
+										echo ('<input type="radio" id="Opcion1" name="optAnulado" value="0" disabled /> No <input type="radio" id="Opcion2" name="optAnulado" value="1" checked="checked" disabled /> Si');
+									} else {
+										echo ('<input type="radio" id="Opcion1" name="optAnulado" value="0" checked="checked" disabled /> No <input type="radio" id="Opcion2" name="optAnulado" value="1" disabled /> Si');
+									}
+									?>
+								</div>
+							</div>
 						</div>
-					</div>
+
+						<div class="row">
+							<div class="col-auto col-xs-offset-none col-md-12 col-md-offset-2">
+								<?php
+								if ($Anulado == 1)
+									echo ('<input type="submit" id="Guardar" name="Guardar" value="Guardar" class="btn btn-warning" disabled />');
+								else
+									echo ('<input type="submit" id="Guardar" name="Guardar" value="Guardar" class="btn btn-warning" />');
+								?>
+								<input type="button" id="Cancelar" name="Cancelar" value="Cancelar" class="btn btn-warning" onclick="location.href='gridCobros.php';" />
+							</div>
+						</div>
 					</form>
 				</div>
 	<?php	}

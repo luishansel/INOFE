@@ -27,15 +27,24 @@
 		$mDatos->execute([$msEstudiante, $msCurso, $mnTipoAsistencia, $mdFecha, $mnDescuento, $msMotivo, $msMedio, $mnFuenteIngreso, $mbPrimeraVez, $mbBecado, $msBecadoPor, $mbInatec, $mbDocIdentidad, $mbDocAcademico, $mbCertDigital, $msCodigo]);
 	}
 	
-	function fxDevuelveMatricula($mbLlenaGrid, $msCodigo = "")
+	function fxDevuelveMatricula($mbLlenaGrid, $msCodigo = "", $mnAnno = 0)
 	{
 		$m_cnx_MySQL = fxAbrirConexion();
 		
 		if ($mbLlenaGrid == 1)
 		{
-			$msConsulta = "select MATRICULA_REL, concat(APELLIDOS_010, ', ', NOMBRES_010) as ESTUDIANTE, concat(NOMBRE_020, ' (', CONVOCATORIA_020, ' /G', GRUPO_020, ')') as NOMBRE_020, FECHA_030, (case ESTADO_030 when 0 then 'Activo' when 1 then 'Inactivo' when 2 then 'Deserción' when 3 then 'Certificado' when 4 then 'Anulado' else 'Baja' end) as ESTADO_030 from KDSA030A, KDSA020A, KDSA010A where KDSA030A.CURSO_REL = KDSA020A.CURSO_REL and KDSA030A.ESTUDIANTE_REL = KDSA010A.ESTUDIANTE_REL order by MATRICULA_REL desc";
-			$mDatos = $m_cnx_MySQL->prepare($msConsulta);
-			$mDatos->execute();
+			if ($mnAnno == 0)
+			{
+				$msConsulta = "select MATRICULA_REL, concat(APELLIDOS_010, ', ', NOMBRES_010) as ESTUDIANTE, concat(NOMBRE_020, ' (', CONVOCATORIA_020, ' /G', GRUPO_020, ')') as NOMBRE_020, FECHA_030, (case ESTADO_030 when 0 then 'Activo' when 1 then 'Inactivo' when 2 then 'Deserción' when 3 then 'Certificado' when 4 then 'Anulado' else 'Baja' end) as ESTADO_030 from KDSA030A, KDSA020A, KDSA010A where KDSA030A.CURSO_REL = KDSA020A.CURSO_REL and KDSA030A.ESTUDIANTE_REL = KDSA010A.ESTUDIANTE_REL order by MATRICULA_REL desc";
+				$mDatos = $m_cnx_MySQL->prepare($msConsulta);
+				$mDatos->execute();
+			}
+			else
+			{
+				$msConsulta = "select MATRICULA_REL, concat(APELLIDOS_010, ', ', NOMBRES_010) as ESTUDIANTE, concat(NOMBRE_020, ' (', CONVOCATORIA_020, ' /G', GRUPO_020, ')') as NOMBRE_020, FECHA_030, (case ESTADO_030 when 0 then 'Activo' when 1 then 'Inactivo' when 2 then 'Deserción' when 3 then 'Certificado' when 4 then 'Anulado' else 'Baja' end) as ESTADO_030 from KDSA030A, KDSA020A, KDSA010A where KDSA030A.CURSO_REL = KDSA020A.CURSO_REL and KDSA030A.ESTUDIANTE_REL = KDSA010A.ESTUDIANTE_REL and year(FECHA_030) = ? order by MATRICULA_REL desc";
+				$mDatos = $m_cnx_MySQL->prepare($msConsulta);
+				$mDatos->execute([$mnAnno]);
+			}
 		}
 		else
 		{
