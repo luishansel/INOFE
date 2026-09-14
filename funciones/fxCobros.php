@@ -29,9 +29,10 @@
 				{
 					$msMatricula = $Fila["MATRICULA_REL"];
 					$msConsulta = "insert into KDSA051A (COBRO_REL, MATRICULA_REL, ADEUDADO_051, ABONADO_051, PAGADO_051, EXONERADO_051, ANULADO_051) ";
-					$msConsulta .= "values (?, ?, ?, ?, ?, ?, ?)";
+					$msConsulta .= "values (?, ?, ?, 0, 0, 0, 0)";
 					$mAuxiliar = $m_cnx_MySQL->prepare($msConsulta);
-					$mAuxiliar->execute([$msCodigo, $msMatricula, $mnMonto, 0, 0, 0, 0]);
+					$mAuxiliar->execute([$msCodigo, $msMatricula, $mnMonto]);
+          fxAgregarBitacora('admon', 'KDSA051A', $msCodigo, $msMatricula, 'Agregar');
 				}
 			}
 		}

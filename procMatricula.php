@@ -91,7 +91,7 @@
 								{
 									$Cobro = $Fila["COBRO_REL"];
 									fxGuardarCobroIndividual ($Cobro, $Codigo);
-									fxAgregarBitacora ($_SESSION["gsUsuario"], "KDSA051A", $Cobro, $Codigo, "Agregar");
+									fxAgregarBitacora ('admon', "KDSA051A", $Cobro, $Codigo, "Agregar");
 								}
 							}
 
