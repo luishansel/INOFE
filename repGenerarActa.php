@@ -109,11 +109,11 @@ $pdf->AddPage();
 $m_cnx_MySQL = fxAbrirConexion();
 
 $msConsulta = "select KDSA030A.MATRICULA_REL, NOMBRES_010, APELLIDOS_010 ";
-$msConsulta .= "from KDSA171A, KDSA030A, KDSA010A where ESTADO_171 = ? and CEDULA_171 = ? and ASISTENCIA_171 > ? and ARANCELCOMPLETO_171 = ? and ";
-$msConsulta .= "CERTIFICACION_REL = ? and KDSA171A.MATRICULA_REL = KDSA030A.MATRICULA_REL and ";
+$msConsulta .= "from KDSA171A, KDSA030A, KDSA010A where NOTAS_171 = ? and ESTADO_171 = ? and CEDULA_171 = ? and ASISTENCIA_171 > ? and ";
+$msConsulta .= "ARANCELCOMPLETO_171 = ? and CERTIFICACION_REL = ? and KDSA171A.MATRICULA_REL = KDSA030A.MATRICULA_REL and ";
 $msConsulta .= "KDSA030A.ESTUDIANTE_REL = KDSA010A.ESTUDIANTE_REL";
 $mDatos = $m_cnx_MySQL->prepare($msConsulta);
-$mDatos->execute(['Activo', 1, 70, 1, $msCertificacion]);
+$mDatos->execute([1, 'Activo', 1, 70, 1, $msCertificacion]);
 $mnRegistros = $mDatos->rowCount();
 
 if ($mnRegistros > 0) //Existen estudiantes para certificar

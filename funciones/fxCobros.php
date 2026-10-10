@@ -126,15 +126,23 @@
 		$mDatos->execute([$msCodigo]);
 	}
 	
-	function fxDevuelveCobros($mbLlenaGrid, $msCodigo = "")
+	function fxDevuelveCobros($mbLlenaGrid, $msCodigo = "", $mnAnno = 0)
 	{
 		$m_cnx_MySQL = fxAbrirConexion();
 		
 		if ($mbLlenaGrid == 1)
 		{
-			$msConsulta = "select COBRO_REL, NOMBRE_020, CONVOCATORIA_020, GRUPO_020, CONCEPTO_050, (case TIPO_050 when 0 then 'Cuota' when 1 then 'Moratorio' when 2 then 'Matrícula' when 3 then 'Empresarial' when 4 then 'INATEC' when 5 then 'Certificado' when 6 then 'Cuota especial' end) as TIPO_050, FECHAPREVISTA_050, MONTO_050, (case ACTIVO_050 when 1 then 'x' else '' end) as ACTIVO_050, (case ANULADO_050 when 1 then 'x' else '' end) as ANULADO_050 from KDSA050A, KDSA020A where KDSA050A.CURSO_REL = KDSA020A.CURSO_REL order by COBRO_REL desc";
-			$mDatos = $m_cnx_MySQL->prepare($msConsulta);
-			$mDatos->execute();
+			if ($mnAnno == 0)
+			{
+				$msConsulta = "select COBRO_REL, NOMBRE_020, CONVOCATORIA_020, GRUPO_020, CONCEPTO_050, (case TIPO_050 when 0 then 'Cuota' when 1 then 'Moratorio' when 2 then 'Matrícula' when 3 then 'Empresarial' when 4 then 'INATEC' when 5 then 'Certificado' when 6 then 'Cuota especial' end) as TIPO_050, FECHAPREVISTA_050, MONTO_050, (case ACTIVO_050 when 1 then 'x' else '' end) as ACTIVO_050, (case ANULADO_050 when 1 then 'x' else '' end) as ANULADO_050 from KDSA050A, KDSA020A where KDSA050A.CURSO_REL = KDSA020A.CURSO_REL order by COBRO_REL desc";
+				$mDatos = $m_cnx_MySQL->prepare($msConsulta);
+				$mDatos->execute();
+			}
+			{
+				$msConsulta = "select COBRO_REL, NOMBRE_020, CONVOCATORIA_020, GRUPO_020, CONCEPTO_050, (case TIPO_050 when 0 then 'Cuota' when 1 then 'Moratorio' when 2 then 'Matrícula' when 3 then 'Empresarial' when 4 then 'INATEC' when 5 then 'Certificado' when 6 then 'Cuota especial' end) as TIPO_050, FECHAPREVISTA_050, MONTO_050, (case ACTIVO_050 when 1 then 'x' else '' end) as ACTIVO_050, (case ANULADO_050 when 1 then 'x' else '' end) as ANULADO_050 from KDSA050A, KDSA020A where KDSA050A.CURSO_REL = KDSA020A.CURSO_REL and year(FECHAPREVISTA_050) = ? order by COBRO_REL desc";
+				$mDatos = $m_cnx_MySQL->prepare($msConsulta);
+				$mDatos->execute([$mnAnno]);
+			}
 		}
 		else
 		{

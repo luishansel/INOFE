@@ -11,6 +11,7 @@
 	require_once ("funciones/fxUsuarios.php");
 	require_once ("funciones/fxCobros.php");
 	$Registro = fxVerificaUsuario();
+	$m_cnx_MySQL = fxAbrirConexion();
 	
 	if ($Registro == 0)
 	{
@@ -41,6 +42,15 @@
                 fxAnularCobros($_POST["KDSA"]);
 				fxAgregarBitacora($_SESSION["gsUsuario"], "KDSA050A", $_POST["KDSA"], "", "Anular");
             }
+
+			if (isset($_POST["mnOpcion"]) and isset($_POST["mnAnno"])){
+				$mnOpcion = $_POST["mnOpcion"];
+				$mnAnno = $_POST["mnAnno"];
+			}
+			else{
+				$mnOpcion = 0;
+				$mnAnno = 0;
+			}
 		?>
     	<div class="container">
         	<div id="DivContenido">
@@ -83,6 +93,45 @@
 							echo('<button id="remove" type="button" class="btn btn-warning" disabled>Anular</button>');
 					?>
                     
+					<div style="float:right; margin-right:1%; display:inline-block">
+						<?php
+							if ($mnOpcion == 0)
+								echo('<input type="radio" name="optFiltro" id="optFiltro1" onchange="fxCambiaOpcion()" checked>Filtrar por año &nbsp;');
+							else
+								echo('<input type="radio" name="optFiltro" id="optFiltro1" onchange="fxCambiaOpcion()">Filtrar por año &nbsp;');
+
+							$msConsulta = "select distinct year(FECHAPREVISTA_050) as ANNO from KDSA050A order by year(FECHAPREVISTA_050) desc";
+							$mDatos = $m_cnx_MySQL->prepare($msConsulta);
+							$mDatos->execute();
+
+							echo('<select style="background-color: white" id="cboAnno" name="cboAnno" onchange="fxCambiaOpcion()">');
+							while ($mFila = $mDatos->fetch())
+							{
+								$Valor = trim($mFila["ANNO"]);
+								$Texto = trim($mFila["ANNO"]);
+								
+								if ($mnAnno == 0)
+								{
+									$mnAnno = $Valor;
+									echo("<option value='" . $Valor . "' selected>" . $Texto . "</option>");
+								}
+								else{
+									if ($Valor == $mnAnno)
+										echo("<option value='" . $Valor . "' selected>" . $Texto . "</option>");
+									else
+										echo("<option value='" . $Valor . "'>" . $Texto . "</option>");
+								}
+								
+							}
+							echo('</select> &nbsp;');
+							
+							if ($mnOpcion == 1)
+								echo('<input type="radio" name="optFiltro" id="optFiltro2" onchange="fxCambiaOpcion()" checked>Todos los registros');
+							else
+								echo('<input type="radio" name="optFiltro" id="optFiltro2" onchange="fxCambiaOpcion()">Todos los registros');
+						?>
+					</div>
+
 					<div class="table-responsive">
 						<table id="grid" class="table table-condensed table-hover table-striped" data-selection="true" data-multi-select="false" data-row-select="true" data-keep-selection="true" style="font-size:small">
 							<thead>
@@ -98,7 +147,10 @@
 							</thead>
 							<tbody>
 							<?php
-								$mDatos = fxDevuelveCobros(1);
+								if ($mnOpcion == 0)
+									$mDatos = fxDevuelveCobros(1, "", $mnAnno);
+								else
+									$mDatos = fxDevuelveCobros(1);
 
 								while ($Fila = $mDatos->fetch())
 								{
@@ -193,6 +245,22 @@
 			}
 		});
     });
+
+	function fxCambiaOpcion(){
+		var mnOpcion;
+		var mnAnno;
+
+		if (document.getElementById("optFiltro1").checked == true){
+			mnOpcion = 0;
+			mnAnno = $("#cboAnno").val();
+		}
+		else{
+			mnOpcion = 1;
+			mnAnno = 0;
+		}
+
+		$.redirect("gridCobros.php", {mnOpcion: mnOpcion, mnAnno: mnAnno}, "POST");
+	}
 </script>
 </body>
 </html>

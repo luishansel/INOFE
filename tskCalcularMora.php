@@ -40,39 +40,54 @@ while ($mrFila = $mDatos->fetch())
 
 			while ($mrAuxiliar = $mAuxiliar->fetch())
 			{
-				$msFechaPrevista = $mrCobros["FECHAPREVISTA_050"];
+				$msFechaPrevista = $mrAuxiliar["FECHAPREVISTA_050"];
 				$mdFechaPrevista = new DateTime($msFechaPrevista);
 				$mdFechaHoy = new DateTime("now");
 				$mDiferencia = $mdFechaHoy->diff($mdFechaPrevista);
 				$mnDias = $mDiferencia->days;
-				$mnTipo = intval($mrCobros["TIPO_050"]);
+				$mnTipo = intval($mrAuxiliar["TIPO_050"]);
 
 				//Sólo cobros de cuota
 				if ($mnTipo == 0 or $mnTipo == 6)
 				{
-					//Verifica que la fecha aún no se vence: $mDiferencia->invert (0 = futuro, 1 = pasado).
-					if ($mDiferencia->invert)
+					//La Fecha Prevista ya pasó
+					if ($mdFechaHoy > $mdFechaPrevista)
 					{
 						if ($mnDias >= 30)
 							$mnMoraHoy = $mnMoraMensual;
 						else
 							$mnMoraHoy = $mnMoraDiaria * $mnDias;
 
-						$msConsulta = "select * from KDSA051A where COBRO_REL = ? and MATRICULA_REL = ?";
+						//Obtiene el código del cobro de la mora
+						$msConsulta = "Select COBRO_REL from KDSA050A where KDS_COBRO_REL = ?";
+						$mCodigoMora = $m_cnx_MySQL->prepare($msConsulta);
+						$mCodigoMora->execute([$msCobro]);
+						$mrCodigoMora = $mCodigoMora->fetch();
+						$msCodMora = $mrCodigoMora["COBRO_REL"];
+
+						//Obtiene el registro de la mora
+						$msConsulta = "select COBRO_REL, ABONADO_051 from KDSA051A where COBRO_REL = ? and MATRICULA_REL = ? and PAGADO_051 = 0";
 						$mExisteMora = $m_cnx_MySQL->prepare($msConsulta);
-						$mExisteMora->execute([$msCobro, $msMatricula]);
+						$mExisteMora->execute([$msCodMora, $msMatricula]);
 						$mnRegistros = $mExisteMora->rowCount();
 
 						if ($mnRegistros == 0)
 						{
 							$msConsulta = "insert into KDSA051A (COBRO_REL, MATRICULA_REL, ADEUDADO_051, ABONADO_051, PAGADO_051, EXONERADO_051, ANULADO_051)";
-							$msConsulta .= "values (?, ?, ?, 0, 0, 0, 0)";
-							$mMoratorio->execute([$msCobro, $msMatricula, $mnMoraHoy]);
+							$msConsulta .= "values (?, ?, ?, ?, ?, ?, ?)";
+							$mMoratorio = $m_cnx_MySQL->prepare($msConsulta);
+							$mMoratorio->execute([$msCodMora, $msMatricula, $mnMoraHoy, 0, 0, 0, 0]);
 						}
 						else
 						{
+							$mrMoratorio = $mExisteMora->fetch();
+							$mnAbonado = floatval($mrMoratorio["ABONADO_051"]);
+							if ($mnAbonado > 0)
+								$mnMoraHoy = $mnMoraHoy - $mnAbonado;
+
 							$msConsulta = "update KDSA051A set ADEUDADO_051 = ? where COBRO_REL = ? and MATRICULA_REL = ?";
-							$mMoratorio->execute([$mnMoraHoy, $msCobro, $msMatricula]);
+							$mMoratorio = $m_cnx_MySQL->prepare($msConsulta);
+							$mMoratorio->execute([$mnMoraHoy, $msCodMora, $msMatricula]);
 						}
 					}
 				}
