@@ -133,13 +133,15 @@
 									echo('<input type="radio" name="optFiltro" id="optFiltro2" onchange="fxCambiaOpcion()">Todos los registros');
 							?>
 						</div>
+
 						<div class="table-responsive">
 							<table id="grid" class="table table-condensed table-hover table-striped" data-selection="true" data-multi-select="false" data-row-select="true" data-keep-selection="true" style="font-size:small">
 								<thead>
 									<tr>
 										<th data-column-id="MATRICULA_REL" data-order="desc" data-identifier="true" data-align="left" data-header-align="left" data-width="10%">Matrícula</th>
-										<th data-column-id="ESTUDIANTE" data-order="desc" data-align="left" data-header-align="left" data-width="26%">Nombre del Estudiante</th>
-										<th data-column-id="NOMBRE_020" data-align="left" data-header-align="left" data-width="40%">Curso matriculado</th>
+										<th data-column-id="ESTUDIANTE" data-order="desc" data-align="left" data-header-align="left" data-width="25%">Nombre del Estudiante</th>
+										<th data-column-id="CURSO_REL" data-align="left" data-header-align="left" data-width="10%">Curso</th>
+										<th data-column-id="NOMBRE_020" data-align="left" data-header-align="left">Curso matriculado</th>
 										<th data-column-id="FECHA_030" data-align="center" data-header-align="center" data-width="15%">Fecha</th>
 										<th data-column-id="ESTADO_030" data-align="center" data-header-align="center" data-width="9%">Estado</th>
 									</tr>
@@ -156,6 +158,7 @@
 										echo ("<tr>");
 										echo ("<td>" . $Fila["MATRICULA_REL"] . "</td>");
 										echo ("<td>" . $Fila["ESTUDIANTE"] . "</td>");
+										echo ("<td>" . $Fila["CURSO_REL"] . "</td>");
 										echo ("<td>" . $Fila["NOMBRE_020"] . "</td>");
 										$fecha = date_create_from_format('Y-m-d', $Fila["FECHA_030"]);
 										echo ("<td>" . date_format($fecha, 'd-m-Y') . "</td>");

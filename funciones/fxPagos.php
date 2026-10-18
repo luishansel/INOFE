@@ -232,7 +232,7 @@
 		
 		if ($msCodigo == "")
 		{
-			$msConsulta = "select CONCEPTO_050, ADEUDADO_051 as DEUDA, 0 as PAGO, 0 as DESCUENTO, KDSA051A.COBRO_REL, FECHAPREVISTA_050, KDSA051A.MATRICULA_REL from KDSA051A, KDSA050A, KDSA030A where PAGADO_051 = 0 and EXONERADO_051 = 0 and ANULADO_051 = 0 and KDSA051A.MATRICULA_REL = KDSA030A.MATRICULA_REL and KDSA051A.COBRO_REL = KDSA050A.COBRO_REL and ESTADO_030 <> 4 and KDSA030A.ESTUDIANTE_REL = ?";
+			$msConsulta = "select CONCEPTO_050, ADEUDADO_051 as DEUDA, 0 as PAGO, 0 as DESCUENTO, KDSA051A.COBRO_REL, FECHAPREVISTA_050, KDSA051A.MATRICULA_REL from KDSA051A, KDSA050A, KDSA030A where PAGADO_051 = 0 and EXONERADO_051 = 0 and ANULADO_051 = 0 and KDSA051A.MATRICULA_REL = KDSA030A.MATRICULA_REL and KDSA051A.COBRO_REL = KDSA050A.COBRO_REL and ESTADO_030 <> 4 and KDSA030A.ESTUDIANTE_REL = ? order by FECHAPREVISTA_050, KDSA051A.COBRO_REL";
 			$mDatos = $m_cnx_MySQL->prepare($msConsulta);
 			$mDatos->execute([$msEstudiante]);
 		}
@@ -258,7 +258,7 @@
 	{
 		$m_cnx_MySQL = fxAbrirConexion();
 		
-		$msConsulta = "select KDSA040A.PAGO_REL, RECIBO_040, FECHA_040, NOMBRE_040, CONCEPTO_040, MONTO_040, (case MONEDA_040 when 0 then 'Córdobas' else 'Dólares' end) as MONEDA_040, (case ANULADO_040 when 1 then 'x' else '' end) as ANULADO_040 from KDSA040A where OTROINGRESO_040 = 1 order by KDSA040A.PAGO_REL desc";
+		$msConsulta = "select KDSA040A.PAGO_REL, concat(SERIE_040, ' ', RECIBO_040) as RECIBO_040, FECHA_040, NOMBRE_040, CONCEPTO_040, MONTO_040, (case MONEDA_040 when 0 then 'Córdobas' else 'Dólares' end) as MONEDA_040, (case ANULADO_040 when 1 then 'x' else '' end) as ANULADO_040 from KDSA040A where OTROINGRESO_040 = 1 order by KDSA040A.PAGO_REL desc";
 		$mDatos = $m_cnx_MySQL->prepare($msConsulta);
 		$mDatos->execute();
 		return $mDatos;
@@ -268,7 +268,10 @@
 	{
 		$m_cnx_MySQL = fxAbrirConexion();
 		
-		$msConsulta = "select KDSA040A.PAGO_REL, FECHA_040, NOMBRE_040, CONCEPTO_040, MONTO_040, (case MONEDA_040 when 0 then 'Córdobas' else 'Dólares' end) as MONEDA_040, (case ANULADO_040 when 1 then 'x' else '' end) as ANULADO_040 from KDSA040A where EMPRESARIAL_040 = 1 order by KDSA040A.PAGO_REL desc";
+		$msConsulta = "select KDSA040A.PAGO_REL, FECHA_040, NOMBRE_040, concat(SERIE_040, ' ', RECIBO_040) as RECIBO_040, CONCEPTO_040, ";
+		$msConsulta .= "MONTO_040, (case MONEDA_040 when 0 then 'Córdobas' else 'Dólares' end) as MONEDA_040, ";
+		$msConsulta .= "(case ANULADO_040 when 1 then 'x' else '' end) as ANULADO_040 ";
+		$msConsulta .= "from KDSA040A where EMPRESARIAL_040 = 1 order by KDSA040A.PAGO_REL desc";
 		$mDatos = $m_cnx_MySQL->prepare($msConsulta);
 		$mDatos->execute();
 		return $mDatos;

@@ -65,10 +65,12 @@ else
 	$mFila = $mDatos->fetch();
 	$Usuario = $mFila["USUARIO_000"];
 
-	$msConsulta = "select FECHA_040, RECIBO_040, NOMBRE_040, TIPOCAMBIO_040, MONEDA_040, MONTO_040, TIPOPAGO_040, NUMEROCK_040, BANCOCK_040 from KDSA040A where PAGO_REL = ?";
+	$msConsulta = "select FECHA_040, RECIBO_040, NOMBRE_040, CONCEPTO_040, TIPOCAMBIO_040, MONEDA_040, MONTO_040, TIPOPAGO_040, NUMEROCK_040, BANCOCK_040, EMPRESARIAL_040, OTROINGRESO_040 from KDSA040A where PAGO_REL = ?";
 	$mDatos = $m_cnx_MySQL->prepare($msConsulta);
 	$mDatos->execute([$msPago]);
 	$mFila = $mDatos->fetch();
+	$mbEmpresarial = $mFila["EMPRESARIAL_040"];
+	$mbOtroIngreso = $mFila["OTROINGRESO_040"];
 
 	$FechaDividida = explode("-", $mFila["FECHA_040"]);
 	$Anno = $FechaDividida[0];
@@ -98,71 +100,85 @@ else
 	$pdf->Text(35, $mnLinea, $msTexto);
 
 	//CONCEPTO DEL RECIBO
-	$msConsulta = "select distinct TIPO_050 from KDSA041A, KDSA050A where KDSA041A.COBRO_REL = KDSA050A.COBRO_REL and PAGO_REL = ?";
-	$mAuxiliar = $m_cnx_MySQL->prepare($msConsulta);
-	$mAuxiliar->execute([$msPago]);
-	$msConcepto = "Pago de";
-	$mnRegistros = $mAuxiliar->rowCount();
-	$i=1;
-
-	while ($mAuxFila = $mAuxiliar->fetch())
+	if ($mbOtroIngreso == 0)
 	{
-		switch (intval($mAuxFila["TIPO_050"])){
-			case 0:
-				$msTipo = "Arancel";
-				break;
-			case 1:
-				$msTipo = "Moratorio";
-				break;
-			case 2:
-				$msTipo = "Matrícula";
-				break;
-			case 3:
-				$msTipo = "Empresarial";
-				break;
-			case 4:
-				$msTipo = "INATEC";
-				break;
-			case 5:
-				$msTipo = "Certificado";
-				break;
-			case 6:
-				$msTipo = "Arancel especial";
-				break;
+		if ($mbEmpresarial == 0)
+		{
+			$msConsulta = "select distinct TIPO_050 from KDSA041A, KDSA050A where KDSA041A.COBRO_REL = KDSA050A.COBRO_REL and PAGO_REL = ?";
+			$msConcepto = "Pago de";
 		}
-
-		if ($i == 1)
-			$msConcepto .= " " . $msTipo;
-		else{
-			if ($i == $mnRegistros)
-				$msConcepto .= " y " . $msTipo;
-			else
-				$msConcepto .= ", " . $msTipo;
+		else
+		{
+			$msConsulta = "select distinct TIPO_050 from KDSA042A, KDSA050A where KDSA042A.COBRO_REL = KDSA050A.COBRO_REL and PAGO_REL = ?";
+			$msConcepto = "Pago";
 		}
+		
+		$mAuxiliar = $m_cnx_MySQL->prepare($msConsulta);
+		$mAuxiliar->execute([$msPago]);
+		$mnRegistros = $mAuxiliar->rowCount();
+		$i=1;
 
-		$i++;
+		while ($mAuxFila = $mAuxiliar->fetch())
+		{
+			switch (intval($mAuxFila["TIPO_050"])){
+				case 0:
+					$msTipo = "Arancel";
+					break;
+				case 1:
+					$msTipo = "Moratorio";
+					break;
+				case 2:
+					$msTipo = "Matrícula";
+					break;
+				case 3:
+					$msTipo = "Empresarial";
+					break;
+				case 4:
+					$msTipo = "INATEC";
+					break;
+				case 5:
+					$msTipo = "Certificado";
+					break;
+				case 6:
+					$msTipo = "Arancel especial";
+					break;
+			}
+
+			if ($i == 1)
+				$msConcepto .= " " . $msTipo;
+			else{
+				if ($i == $mnRegistros)
+					$msConcepto .= " y " . $msTipo;
+				else
+					$msConcepto .= ", " . $msTipo;
+			}
+
+			$i++;
+		}
 	}
+	else
+		$msConcepto = $mFila["CONCEPTO_040"];
 	
 	$mnLinea += 8;
 	$pdf->Text(35, $mnLinea, trim($msConcepto));
 
 	//CURSO
-	$msConsulta = "select EMPRESARIAL_040 from KDSA040A where PAGO_REL = ?";
-	$mAuxiliar = $m_cnx_MySQL->prepare($msConsulta);
-	$mAuxiliar->execute([$msPago]);
-	$mAuxFila = $mAuxiliar->fetch();
-	$mbEmpresarial = $mAuxFila["EMPRESARIAL_040"];
-
-	if ($mbEmpresarial == 0)
-		$msConsulta = "select NOMBRE_020 from KDSA041A, KDSA050A, KDSA020A where KDSA041A.COBRO_REL = KDSA050A.COBRO_REL and KDSA050A.CURSO_REL = KDSA020A.CURSO_REL and PAGO_REL = ? limit 1";
+	if ($mbOtroIngreso == 0)
+	{
+		if ($mbEmpresarial == 0)
+			$msConsulta = "select NOMBRE_020 from KDSA041A, KDSA050A, KDSA020A where KDSA041A.COBRO_REL = KDSA050A.COBRO_REL and KDSA050A.CURSO_REL = KDSA020A.CURSO_REL and PAGO_REL = ? limit 1";
+		else
+			$msConsulta = "select NOMBRE_020 from KDSA042A, KDSA050A, KDSA020A where KDSA042A.COBRO_REL = KDSA050A.COBRO_REL and KDSA050A.CURSO_REL = KDSA020A.CURSO_REL and PAGO_REL = ? limit 1";
+		$mAuxiliar = $m_cnx_MySQL->prepare($msConsulta);
+		$mAuxiliar->execute([$msPago]);
+		$mAuxFila = $mAuxiliar->fetch();
+		$msCurso = $mAuxFila["NOMBRE_020"];
+	}
 	else
-		$msConsulta = "select NOMBRE_020 from KDSA042A, KDSA050A, KDSA020A where KDSA042A.COBRO_REL = KDSA050A.COBRO_REL and KDSA050A.CURSO_REL = KDSA020A.CURSO_REL and PAGO_REL = ? limit 1";
-	$mAuxiliar = $m_cnx_MySQL->prepare($msConsulta);
-	$mAuxiliar->execute([$msPago]);
-	$mAuxFila = $mAuxiliar->fetch();
+		$msCurso = "";
 	
 	$mnLinea += 10;
-	$pdf->Text(35, $mnLinea, mb_convert_encoding(html_entity_decode($mAuxFila["NOMBRE_020"]), "UTF-8"));
+	$pdf->Text(35, $mnLinea, mb_convert_encoding(html_entity_decode($msCurso), "UTF-8"));
 
 	//TIPO DE PAGO
 	switch (intval($mFila["TIPOPAGO_040"])){

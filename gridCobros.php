@@ -137,8 +137,9 @@
 							<thead>
 								<tr>
 									<th data-column-id="COBRO_REL" data-identifier="true" data-align="left" data-header-align="left" data-width="10%">Cobro</th>
-									<th data-column-id="NOMBRE_020" data-align="left" data-header-align="left">Curso</th>
-									<th data-column-id="CONCEPTO_050" data-align="left" data-header-align="left" data-width="25%">Concepto</th>
+									<th data-column-id="CURSO_REL" data-identifier="true" data-align="left" data-header-align="left" data-width="10%">Curso</th>
+									<th data-column-id="NOMBRE_020" data-align="left" data-header-align="left">Nombre de Curso</th>
+									<th data-column-id="CONCEPTO_050" data-align="left" data-header-align="left" data-width="20%">Concepto</th>
 									<th data-column-id="TIPO_050" data-align="left" data-header-align="left" data-width="10%">Tipo</th>
 									<th data-column-id="FECHAPREVISTA_050" data-align="center" data-header-align="center" data-width="10%">Fecha prevista</th>
 									<th data-column-id="ACTIVO_050" data-align="center" data-header-align="center" data-width="8%">Activo</th>
@@ -156,6 +157,7 @@
 								{
 									echo ("<tr>");
 									echo ("<td>" . $Fila["COBRO_REL"] . "</td>");
+									echo ("<td>" . $Fila["CURSO_REL"] . "</td>");
 									echo ("<td>" . $Fila["NOMBRE_020"] . " (" . $Fila["CONVOCATORIA_020"] . " / G" . $Fila["GRUPO_020"] . ")</td>");
 									echo ("<td>" . $Fila["CONCEPTO_050"] . "</td>");
 									echo ("<td>" . $Fila["TIPO_050"] . "</td>");

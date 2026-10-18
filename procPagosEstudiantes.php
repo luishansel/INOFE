@@ -325,74 +325,74 @@
 							<label for="dgDetalle" class="col-sm-12 col-md-2 form-label">Detalle del pago</label>
 							<div class="col-sm-auto col-md-8">
 								<div id="dvDetalle">
-								<table id="dgDetalle" class="easyui-datagrid table" data-options="iconCls:'icon-edit', singleSelect:true, method:'get'">
-									<thead>
-										<tr>
-											<th data-options="field:'matricula', hidden:true">Matrícula</th>
-											<?php
-											if ($Codigo == "")
-											{?>
-												<th data-options="field:'cobro', hidden:true">Cobro</th>
-												<th data-options="field:'fecha', width:'15%',align:'center'">Fecha</th>
-												<th data-options="field:'concepto',width:'40%',align:'left'">Concepto</th>
-												<th data-options="field:'deuda',width:'15%',align:'right'">Deuda U$</th>
-												<th data-options="field:'cordobas',width:'15%',align:'right'">Deuda C$</th>
-											<?php
-											}
-											else
-											{
-											?>
-												<th data-options="field:'cobro', width:'15%',align:'center'">Cobro</th>
-												<th data-options="field:'fecha', hidden:true">Fecha</th>
-												<th data-options="field:'concepto',width:'70%',align:'left'">Concepto</th>
-												<th data-options="field:'deuda', hidden:true">Deuda U$</th>
-												<th data-options="field:'cordobas', hidden:true">Deuda C$</th>
-											<?php
-											}
-											?>
-
-											<th data-options="field:'pago',width:'15%',align:'right',editor:{type:'numberbox',options:{precision:2}}">Pago</th>
-											<!--th data-options="field:'descuento',width:'12%',align:'right',editor:{type:'numberbox',options:{precision:2}}">Descuento</th -->
-											<th data-options="field:'descuento', hidden:true">Descuento</th>
-										</tr>
-									</thead>
-									<tbody>
-										<?php
-											$mDatos = fxDevuelveDetPagos($Codigo, $Estudiante);
-											while ($mFila = $mDatos->fetch())
-											{
-												$Cobro = $mFila['COBRO_REL'];
-												$msConsulta = "Select MONEDA_050 from KDSA050A where COBRO_REL = ?";
-												$mAuxiliar = $m_cnx_MySQL->prepare($msConsulta);
-												$mAuxiliar->execute([$Cobro]);
-												$AuxFila = $mAuxiliar->fetch();
-
-												echo('<tr>');
-												echo('<td>' . rtrim($mFila['MATRICULA_REL']) . '</td>');
-												echo('<td>' . rtrim($mFila['COBRO_REL']) . '</td>');
-												$fecha = date_create_from_format('Y-m-d', $mFila["FECHAPREVISTA_050"]);
-												echo('<td>' . date_format($fecha, 'd-m-Y') . '</td>');
-												echo('<td>' . rtrim($mFila['CONCEPTO_050']) . '</td>');
-												if ($AuxFila['MONEDA_050'] == 0)
-												{
-													echo('<td>0.00</td>');
-													echo('<td>' . rtrim($mFila['DEUDA']) . '</td>');
+									<table id="dgDetalle" class="easyui-datagrid table" data-options="iconCls:'icon-edit', singleSelect:true, method:'get'">
+										<thead>
+											<tr>
+												<th data-options="field:'matricula', hidden:true">Matrícula</th>
+												<?php
+												if ($Codigo == "")
+												{?>
+													<th data-options="field:'cobro', hidden:true">Cobro</th>
+													<th data-options="field:'fecha', width:'15%',align:'center'">Fecha</th>
+													<th data-options="field:'concepto', width:'40%',align:'left'">Concepto</th>
+													<th data-options="field:'deuda', width:'15%',align:'right'">Deuda U$</th>
+													<th data-options="field:'cordobas', width:'15%',align:'right'">Deuda C$</th>
+												<?php
 												}
 												else
 												{
-													echo('<td>' . rtrim($mFila['DEUDA']) . '</td>');
-													echo('<td>0.00</td>');
+												?>
+													<th data-options="field:'cobro', width:'15%',align:'center'">Cobro</th>
+													<th data-options="field:'fecha', hidden:true">Fecha</th>
+													<th data-options="field:'concepto',width:'70%',align:'left'">Concepto</th>
+													<th data-options="field:'deuda', hidden:true">Deuda U$</th>
+													<th data-options="field:'cordobas', hidden:true">Deuda C$</th>
+												<?php
 												}
-												echo('<td>' . rtrim($mFila['PAGO']) . '</td>');
-												echo('<td>' . rtrim($mFila['DESCUENTO']) . '</td>');
-												echo('</tr>');
-											}
-										?>
-									</tbody>
-								</table>
+												?>
+
+												<th data-options="field:'pago',width:'15%',align:'right',editor:{type:'numberbox',options:{precision:2}}">Pago</th>
+												<!--th data-options="field:'descuento',width:'12%',align:'right',editor:{type:'numberbox',options:{precision:2}}">Descuento</th -->
+												<th data-options="field:'descuento', hidden:true">Descuento</th>
+												<th data-options="field:'tipo', hidden:true">Tipo de cobro</th>
+											</tr>
+										</thead>
+										<tbody>
+											<?php
+												$mDatos = fxDevuelveDetPagos($Codigo, $Estudiante);
+												while ($mFila = $mDatos->fetch())
+												{
+													$Cobro = $mFila['COBRO_REL'];
+													$msConsulta = "Select MONEDA_050, TIPO_050 from KDSA050A where COBRO_REL = ?";
+													$mAuxiliar = $m_cnx_MySQL->prepare($msConsulta);
+													$mAuxiliar->execute([$Cobro]);
+													$AuxFila = $mAuxiliar->fetch();
+
+													echo('<tr>');
+													echo('<td>' . rtrim($mFila['MATRICULA_REL']) . '</td>');
+													echo('<td>' . rtrim($mFila['COBRO_REL']) . '</td>');
+													$fecha = date_create_from_format('Y-m-d', $mFila["FECHAPREVISTA_050"]);
+													echo('<td>' . date_format($fecha, 'd-m-Y') . '</td>');
+													echo('<td>' . rtrim($mFila['CONCEPTO_050']) . '</td>');
+													if ($AuxFila['MONEDA_050'] == 0)
+													{
+														echo('<td>0.00</td>');
+														echo('<td>' . rtrim($mFila['DEUDA']) . '</td>');
+													}
+													else
+													{
+														echo('<td>' . rtrim($mFila['DEUDA']) . '</td>');
+														echo('<td>0.00</td>');
+													}
+													echo('<td>' . rtrim($mFila['PAGO']) . '</td>');
+													echo('<td>' . rtrim($mFila['DESCUENTO']) . '</td>');
+													echo('<td>' . rtrim($AuxFila['TIPO_050']) . '</td>');
+													echo('</tr>');
+												}
+											?>
+										</tbody>
+									</table>
 								</div>
-							</div>
-							<div class="col-auto">
 							</div>
 						</div>
 						
@@ -443,7 +443,7 @@
 	{
 		var gridDetalle = $('#dgDetalle').datagrid('getData');
 		var registros = $('#dgDetalle').datagrid('getRows').length - 1;
-		var i;
+		var i, j;
 		
 		if(document.getElementById('txnFechaCerrada').value=="1")
 		{
@@ -469,6 +469,12 @@
 			return false;
 		}
 		
+		if(document.getElementById('optTipoPago1').checked && (document.getElementById('txtNumeroCk').value!="" || document.getElementById('txtBancoCk').value!=""))
+		{
+			$.messager.alert('INOFE','El pago es en efectivo pero tiene referencias bancarias.','warning');
+			return false;
+		}
+
 		if(document.getElementById('optTipoPago2').checked && document.getElementById('txtNumeroCk').value=="")
 		{
 			$.messager.alert('INOFE','Falta el Número de referencia del POS.','warning');
@@ -545,6 +551,22 @@
 				{
 					$.messager.alert('INOFE','El pago de ' + $.trim(gridDetalle.rows[i].concepto) + ' es mayor que la Deuda en dólares.','warning');
 					return false;
+				}
+			}
+		}
+
+		//Valida que los pagos se hagan en orden
+		for (i=0; i<=registros; i++)
+		{
+			if (Number(gridDetalle.rows[i].pago) > 0 && Number(gridDetalle.rows[i].tipo) != 5)
+			{
+				for (j=0; j<i; j++)
+				{
+					if (Number(gridDetalle.rows[j].pago) == 0 && Number(gridDetalle.rows[j].tipo) != 5)
+					{
+						$.messager.alert('INOFE','Existen cobros anteriores que no han sido cancelados.','warning');
+						return false;
+					}
 				}
 			}
 		}

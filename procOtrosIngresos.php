@@ -10,6 +10,7 @@
 	require_once ("funciones/fxGeneral.php");
 	require_once ("funciones/fxUsuarios.php");
 	require_once ("funciones/fxPagos.php");
+	$m_cnx_MySQL = fxAbrirConexion();
 	$Registro = fxVerificaUsuario();
 	
 	if ($Registro == 0)
@@ -103,7 +104,7 @@
 					$RetDgi = 0;
 					$RetAlcaldia = 0;
 					$Moneda = 0;
-					$TipoCambio = 0;
+					$TipoCambio = 36.6243;
 					$Concepto = "";
 					$TipoPago = 0;
 					$NumeroCk = "";
@@ -137,6 +138,8 @@
 								echo('<input type="date" class="form-control" id="dtpFecha" name="dtpFecha" value="' . date("Y-m-d") . '" />');
 							else
 								echo('<input type="date" class="form-control" id="dtpFecha" name="dtpFecha" value="' . $Fecha . '" />');
+
+							echo('<input type="hidden" class="form-control" id="txnFechaCerrada" name="txnFechaCerrada" value="" />');
 						?>
                         </div>
                     </div>
@@ -151,7 +154,7 @@
                     <div class = "form-group row">
 						<label for="txtRecibo" class="col-sm-12 col-md-2 col-form-label">Recibo</label>
                         <div class="col-sm-12 col-md-3">
-						<?php echo('<input type="text" class="form-control" id="txtRecibo" name="txtRecibo" value="' . $Recibo . '" />'); ?>
+						<?php echo('<input type="text" class="form-control" id="txtRecibo" name="txtRecibo" value="' . $Recibo . '" readonly />'); ?>
                         </div>
                     </div>
                     
@@ -210,10 +213,10 @@
                         <div class="col-sm-12 col-md-4">
                             <div class = "radio">
                             <?php
-                                if ($Moneda == 1 or $Codigo == "")
-                                    echo('<input type="radio" id="optMoneda1" name="optMoneda" value="0" /> Córdobas <input type="radio" id="optMoneda2" name="optMoneda" value="1" checked /> Dólares');
-                                else
-                                    echo('<input type="radio" id="optMoneda1" name="optMoneda" value="0" checked /> Córdobas <input type="radio" id="optMoneda2" name="optMoneda" value="1" /> Dólares');
+                                if ($Moneda == 1)
+										echo('<input type="radio" id="optMoneda1" name="optMoneda" value="0" /> Córdobas <input type="radio" id="optMoneda2" name="optMoneda" value="1" checked /> Dólares');
+									else
+										echo('<input type="radio" id="optMoneda1" name="optMoneda" value="0" checked /> Córdobas <input type="radio" id="optMoneda2" name="optMoneda" value="1" /> Dólares');
                             ?>
                             </div>
                         </div>
@@ -325,14 +328,44 @@
 </body>
 </html>
 <script type='text/javascript'>
+	function fechaCerrada()
+	{
+		var datos = new FormData();
+		var mdFecha = document.getElementById('dtpFecha').value;
+		datos.append('fechaCierre', mdFecha);
+
+		$.ajax({
+			url: 'funciones/fxDatosCierreCaja.php',
+			type: 'post',
+			data: datos,
+			contentType: false,
+			processData: false,
+			success: function(response) {
+				document.getElementById('txnFechaCerrada').value = response;
+			}
+		});
+    	return false;
+	}
+
+	window.onload = function() {
+		fechaCerrada();
+		document.getElementById("txnTipoCambio").value = 36.6243;
+	}
+
 	function verificarFormulario()
 	{
+		if(document.getElementById('txnFechaCerrada').value=="1")
+		{
+			$.messager.alert('INOFE','No puede ingresar el pago. Ya se hizo el cierre de caja de ' + $('#dtpFecha').val(),'warning');
+			return false;
+		}
+/*
 		if(document.getElementById('txtRecibo').value=="")
 		{
 			$.messager.alert('INOFE','Falta el Número de Recibo.','warning');
 			return false;
 		}
-		
+*/		
 		if(document.getElementById('txnTipoCambio').value==0)
 		{
 			$.messager.alert('INOFE','Falta el Tipo de Cambio.','warning');
@@ -342,6 +375,12 @@
 		if(document.getElementById('txtConcepto').value=="")
 		{
 			$.messager.alert('INOFE','Falta el Concepto del pago.','warning');
+			return false;
+		}
+
+		if(document.getElementById('optTipoPago1').checked && (document.getElementById('txtNumeroCk').value!="" || document.getElementById('txtBancoCk').value!=""))
+		{
+			$.messager.alert('INOFE','El pago es en efectivo pero tiene referencias bancarias.','warning');
 			return false;
 		}
 		
