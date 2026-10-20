@@ -95,4 +95,9 @@ while ($mrFila = $mDatos->fetch())
 		}
 	}
 }
+
+//Elimina las posibles smoras en cero
+$msConsulta = "delete from KDSA051A where ADEUDADO_051 = 0 and ABONADO_051 = 0 and PAGADO_051 = 0 and EXONERADO_051 = 0 and ANULADO_051 = 0";
+$mDatos = $m_cnx_MySQL->prepare($msConsulta);
+$mDatos->execute();
 ?>
