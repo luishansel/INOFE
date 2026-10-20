@@ -23,6 +23,15 @@
 <?php }
 	else
 	{
+		if (isset($_POST["mnOpcion"]) and isset($_POST["mnApellido"]))
+		{
+			$mnOpcion = $_POST["mnOpcion"];
+			$mnApellido = $_POST["mnApellido"];
+		}
+		else{
+			$mnOpcion = 0;
+			$mnApellido = 0;
+		}
 		$Administrador = fxVerificaAdministrador();
 		$PermisoUsuario = fxPermisoUsuario("catEstudiantes", $mbAgregar, $mbModificar, $mbBorrar, $mbAnular);
 		
@@ -72,33 +81,76 @@
 							echo('<button id="matricula" type="button" class="btn btn-warning">Matricular</button>');
 							echo('<button id="ctaxcobrar" type="button" class="btn btn-warning">Cuentas por Cobrar</button>');
 						?>
-						
-						<table id="grid" class="table table-condensed table-hover table-striped" data-selection="true" data-multi-select="false" data-row-select="true" data-keep-selection="true">
-							<thead>
-								<tr>
-									<th data-column-id="ESTUDIANTE_REL" data-identifier="true" data-align="left" data-width="15%">Estudiante</th>
-									<th data-column-id="APELLIDOS_010" data-header-align="left" data-width="25%">Apellidos</th>
-									<th data-column-id="NOMBRES_010" data-align="left" data-header-align="left" data-width="25%">Nombres</th>
-									<th data-column-id="CELULAR_010" data-align="left" data-header-align="left" data-width="15%">Celular</th>
-									<th data-column-id="CORREO_010" data-align="left" data-header-align="left" data-width="20%">eMail</th>
-								</tr>
-							</thead>
-							<tbody>
+
+						<div style="float:right; margin-right:1%; display:inline-block">
 							<?php
-								$mDatos = fxDevuelveEstudiantes(1);
-								while ($Fila = $mDatos->fetch())
-								{
-									echo ("<tr>");
-									echo ("<td>" . $Fila["ESTUDIANTE_REL"] . "</td>");
-									echo ("<td>" . $Fila["APELLIDOS_010"] . "</td>");
-									echo ("<td>" . $Fila["NOMBRES_010"] . "</td>");
-									echo ("<td>" . $Fila["CELULAR_010"] . "</td>");
-									echo ("<td>" . $Fila["CORREO_010"] . "</td>");
-								}
-							}
+								if ($mnOpcion == 0)
+									echo('<input type="radio" name="optFiltro" id="optFiltro1" onchange="fxCambiaOpcion()" checked>Filtrar por apellido &nbsp;');
+								else
+									echo('<input type="radio" name="optFiltro" id="optFiltro1" onchange="fxCambiaOpcion()">Filtrar por apellido &nbsp;');
+
+								echo('<select style="background-color: white" id="cboApellido" name="cboApellido" onchange="fxCambiaOpcion()">');
+								if ($mnApellido == 0)
+									echo("<option value='0' selected>A - E</option>");
+								else
+									echo("<option value='0'>A - E</option>");
+
+								if ($mnApellido == 1)
+									echo("<option value='1' selected>F - J</option>");
+								else
+									echo("<option value='1'>F - J</option>");
+
+								if ($mnApellido == 2)
+									echo("<option value='2' selected>K - Ñ</option>");
+								else
+									echo("<option value='2'>K - Ñ</option>");
+
+								if ($mnApellido == 3)
+									echo("<option value='3' selected>O - S</option>");
+								else
+									echo("<option value='3'>O - S</option>");
+
+								if ($mnApellido == 4)
+									echo("<option value='4' selected>T - Z</option>");
+								else
+									echo("<option value='4'>T - Z</option>");
+								echo('</select> &nbsp;');
+								
+								if ($mnOpcion == 1)
+									echo('<input type="radio" name="optFiltro" id="optFiltro2" onchange="fxCambiaOpcion()" checked>Todos los registros');
+								else
+									echo('<input type="radio" name="optFiltro" id="optFiltro2" onchange="fxCambiaOpcion()">Todos los registros');
 							?>
-							</tbody>
-						</table>
+						</div>
+						
+						<div class="table-responsive">
+							<table id="grid" class="table table-condensed table-hover table-striped" data-selection="true" data-multi-select="false" data-row-select="true" data-keep-selection="true">
+								<thead>
+									<tr>
+										<th data-column-id="ESTUDIANTE_REL" data-identifier="true" data-align="left" data-width="15%">Estudiante</th>
+										<th data-column-id="APELLIDOS_010" data-header-align="left" data-width="25%">Apellidos</th>
+										<th data-column-id="NOMBRES_010" data-align="left" data-header-align="left" data-width="25%">Nombres</th>
+										<th data-column-id="CELULAR_010" data-align="left" data-header-align="left" data-width="15%">Celular</th>
+										<th data-column-id="CORREO_010" data-align="left" data-header-align="left" data-width="20%">eMail</th>
+									</tr>
+								</thead>
+								<tbody>
+								<?php
+									$mDatos = fxDevuelveEstudiantes(1, "", $mnApellido);
+									while ($Fila = $mDatos->fetch())
+									{
+										echo ("<tr>");
+										echo ("<td>" . $Fila["ESTUDIANTE_REL"] . "</td>");
+										echo ("<td>" . $Fila["APELLIDOS_010"] . "</td>");
+										echo ("<td>" . $Fila["NOMBRES_010"] . "</td>");
+										echo ("<td>" . $Fila["CELULAR_010"] . "</td>");
+										echo ("<td>" . $Fila["CORREO_010"] . "</td>");
+									}
+								}
+								?>
+								</tbody>
+							</table>
+						</div>
 					</div>
 				</div>
             </div>
@@ -221,6 +273,22 @@
 			}
 		});
 	});
+
+	function fxCambiaOpcion(){
+		var mnOpcion;
+		var mnApellido;
+
+		if (document.getElementById("optFiltro1").checked == true){
+			mnOpcion = 0;
+			mnApellido = $("#cboApellido").val();
+		}
+		else{
+			mnOpcion = 1;
+			mnApellido = 5;
+		}
+
+		$.redirect("gridEstudiantes.php", {mnOpcion: mnOpcion, mnApellido: mnApellido}, "POST");
+	}
 </script>
 </body>
 </html>

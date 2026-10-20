@@ -27,13 +27,37 @@
 		$mDatos->execute([$msNombres, $msApellidos, $msSexo, $msCedula, $msFechaNac, $msDomicilio, $msDireccion, $msTelefono, $msCelular, $msCorreo, $msEmergencia, $msParentesco, $msNivAcademico, $mbPostGrado, $mbMaestria, $msLugarTrabajo, $msPuesto, $msTelEmpresa, $msCodigo]);
 	}
 	
-	function fxDevuelveEstudiantes($mbLlenaGrid, $msCodigo = "")
+	function fxDevuelveEstudiantes($mbLlenaGrid, $msCodigo = "", $mnFiltro = 5)
 	{
 		$m_cnx_MySQL = fxAbrirConexion();
 		
 		if ($mbLlenaGrid == 1)
 		{
-			$msConsulta = "select ESTUDIANTE_REL, NOMBRES_010, APELLIDOS_010, TELEFONO_010, CELULAR_010, CORREO_010, LUGARTRABAJO_010 from KDSA010A order by ESTUDIANTE_REL desc";
+			switch ($mnFiltro)
+			{
+				case 0:
+					$msConsulta = "select ESTUDIANTE_REL, NOMBRES_010, APELLIDOS_010, TELEFONO_010, CELULAR_010, CORREO_010, LUGARTRABAJO_010 from KDSA010A ";
+					$msConsulta .= "where mid(upper(APELLIDOS_010),1,1) between 'A' and 'E' order by APELLIDOS_010 asc";
+					break;
+				case 1:
+					$msConsulta = "select ESTUDIANTE_REL, NOMBRES_010, APELLIDOS_010, TELEFONO_010, CELULAR_010, CORREO_010, LUGARTRABAJO_010 from KDSA010A ";
+					$msConsulta .= "where mid(upper(APELLIDOS_010),1,1) between 'F' and 'J' order by APELLIDOS_010 asc";
+					break;
+				case 2:
+					$msConsulta = "select ESTUDIANTE_REL, NOMBRES_010, APELLIDOS_010, TELEFONO_010, CELULAR_010, CORREO_010, LUGARTRABAJO_010 from KDSA010A ";
+					$msConsulta .= "where mid(upper(APELLIDOS_010),1,1) between 'K' and 'Ñ' order by APELLIDOS_010 asc";
+					break;
+				case 3:
+					$msConsulta = "select ESTUDIANTE_REL, NOMBRES_010, APELLIDOS_010, TELEFONO_010, CELULAR_010, CORREO_010, LUGARTRABAJO_010 from KDSA010A ";
+					$msConsulta .= "where mid(upper(APELLIDOS_010),1,1) between 'O' and 'S' order by APELLIDOS_010 asc";
+					break;
+				case 4:
+					$msConsulta = "select ESTUDIANTE_REL, NOMBRES_010, APELLIDOS_010, TELEFONO_010, CELULAR_010, CORREO_010, LUGARTRABAJO_010 from KDSA010A ";
+					$msConsulta .= "where mid(upper(APELLIDOS_010),1,1) between 'T' and 'Z' order by APELLIDOS_010 asc";
+					break;
+				default:
+					$msConsulta = "select ESTUDIANTE_REL, NOMBRES_010, APELLIDOS_010, TELEFONO_010, CELULAR_010, CORREO_010, LUGARTRABAJO_010 from KDSA010A order by ESTUDIANTE_REL desc";
+			}
 			$mDatos = $m_cnx_MySQL->prepare($msConsulta);
 			$mDatos->execute();
 		}
